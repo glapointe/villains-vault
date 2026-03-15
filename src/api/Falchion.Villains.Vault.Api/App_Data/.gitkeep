@@ -1,0 +1,2 @@
+// Placeholder to keep App_Data folder in source control
+// Database files are in .gitignore but folder structure is preserved

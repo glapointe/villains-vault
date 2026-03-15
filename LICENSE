@@ -1,0 +1,76 @@
+Villains Vault Source Available License
+Version 1.0, February 2026
+
+Copyright (c) 2026 Villains Vault
+
+DEFINITIONS
+
+"Software" means the Villains Vault source code, documentation, assets, and all
+associated files in this repository.
+
+"Component" means an individual, separable portion of the Software, such as a
+single file, module, UI component, utility function, or algorithm, that does not
+by itself constitute a substantially complete version of the Application.
+
+"Application" means the Software as a whole, or any combination of Components
+that together constitute a substantially complete runDisney race result tracking,
+analytics, or social platform equivalent in purpose and function to Villains Vault.
+
+"Distribute" means to make available to any third party by any means, including
+but not limited to publishing, hosting, sharing, or deploying.
+
+"Non-Commercial Purpose" means personal, educational, research, or other use that
+does not involve monetary compensation or commercial advantage.
+
+GRANT OF RIGHTS
+
+Subject to the terms and conditions of this License, the copyright holders grant
+you a worldwide, royalty-free, non-exclusive license to:
+
+  1. Use, copy, and modify individual Components of the Software for
+     Non-Commercial Purposes only.
+
+  2. Distribute modified or unmodified Components for Non-Commercial Purposes,
+     provided that this License notice is included with any such distribution.
+
+RESTRICTIONS
+
+The following are expressly prohibited without prior written permission from the
+copyright holders:
+
+  1. COMMERCIAL USE: Any use of the Software or any Component for commercial
+     purposes, including but not limited to incorporating any Component into a
+     commercial product or service, is prohibited.
+
+  2. FULL APPLICATION DEPLOYMENT: Deploying, hosting, publishing, or otherwise
+     making available the Application (or any substantially complete version
+     thereof) as a product or service — regardless of whether it is rebranded,
+     modified, or redistributed — is prohibited.
+
+  3. COMPETITIVE PRODUCTS: Creating a competing product or service that is
+     derived from the Application is prohibited.
+
+  4. REMOVAL OF NOTICES: Removing or altering any copyright, trademark, or
+     attribution notices contained in the Software is prohibited.
+
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+TERMINATION
+
+Your rights under this License terminate automatically if you fail to comply with
+any of its terms. Upon termination you must cease all use and distribution of the
+Software and destroy any copies in your possession.
+
+CONTACT
+
+For permissions beyond the scope of this License — including commercial licensing
+or other arrangements — contact the copyright holders through the repository.

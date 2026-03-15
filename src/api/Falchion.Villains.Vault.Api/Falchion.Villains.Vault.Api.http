@@ -1,0 +1,673 @@
+@Falchion.Villains.Vault.Api_HostAddress = http://localhost:5000
+# Token is read from environment variable AUTH0_TOKEN
+# Set it in your shell: $env:AUTH0_TOKEN = "your-token-here"
+@auth_token = {{AUTH0_TOKEN}}
+
+# ─────────────────────────────────────────────
+# HEALTH
+# ─────────────────────────────────────────────
+
+### Health Check
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/health
+Accept: application/json
+
+# ─────────────────────────────────────────────
+# EVENTS (Public)
+# ─────────────────────────────────────────────
+
+### Get All Events
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/events
+Accept: application/json
+
+### Get Events by Year
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/events?year=2025
+Accept: application/json
+
+### Get Events by Event Series
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/events?eventSeries=DisneyWorldMarathon
+Accept: application/json
+
+### Get Events by Year and Event Series
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/events?year=2025&eventSeries=DisneyWorldMarathon
+Accept: application/json
+
+### Get Available Years
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/events/years
+Accept: application/json
+
+### Get Available Years Filtered by Event Series
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/events/years?eventSeries=DisneyWorldMarathon
+Accept: application/json
+
+# ─────────────────────────────────────────────
+# RACES (Public)
+# ─────────────────────────────────────────────
+
+### Get Race Details by ID
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1
+Accept: application/json
+
+### Get DNF Count for a Race
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/dnf-count
+Accept: application/json
+
+### Get Weather Data for a Race
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/weather
+Accept: application/json
+
+### Get Race Statistics
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/stats
+Accept: application/json
+
+### Get Race Series Statistics (e.g. all Marathon results across DisneyWorldMarathon events)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/series-stats?eventSeries=DisneyWorldMarathon&raceDistance=FullMarathon
+Accept: application/json
+
+# ─────────────────────────────────────────────
+# RACE RESULTS (Public)
+# ─────────────────────────────────────────────
+
+### Get Race Result by ID
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/results/1
+Accept: application/json
+
+### Get All Results for a Race
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results
+Accept: application/json
+
+### Get All Results Filtered by Gender
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results?gender=Female
+Accept: application/json
+
+### Get All Results Filtered by Runner Type
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results?runnerType=PushRim
+Accept: application/json
+
+### Get All Results Sorted by Name Descending
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results?sortBy=Name&sortDirection=desc
+Accept: application/json
+
+### Get All Results Sorted by Net Time Ascending
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results?sortBy=NetTime&sortDirection=asc
+Accept: application/json
+
+### Get Paged Results for a Race
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results Filtered by Division
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?divisionId=5&page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results Filtered by Gender
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?gender=Male&page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results with Search (searches BibNumber, Name, and Hometown)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?search=john&page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results with Division and Search
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?divisionId=10&search=orlando&page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results Filtered by Region (state or country)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?region=FL&page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results Sorted by Net Time Descending
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?sortBy=NetTime&sortDirection=desc&page=1&pageSize=50
+Accept: application/json
+
+### Get Paged Results with All Options
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/paged?divisionId=5&search=smith&sortBy=OverallPlace&sortDirection=asc&page=1&pageSize=25
+Accept: application/json
+
+### Export Race Results as CSV
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/export
+Accept: text/csv
+
+### Export Race Results as CSV with Filters
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/export?divisionId=5&gender=Female&search=smith
+Accept: text/csv
+
+### Get Last Starter (Balloon Lady) for a Race
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/last-starter
+Accept: application/json
+
+### Stream Race Results (NDJSON)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/stream
+Accept: application/x-ndjson
+
+### Stream Race Results with Filters
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/stream?gender=Female&chunkSize=500
+Accept: application/x-ndjson
+
+### Get Race Result by Bib Number
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/bib/1234
+Accept: application/json
+
+### Get Race Results by Multiple Bib Numbers
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/results/bibs
+Content-Type: application/json
+
+[1234, 5678, 9012]
+
+### Get Closest Starters and Finishers to a Race Result
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/results/1/closest?fieldSize=100
+Accept: application/json
+
+### Get Related Results for a Runner Across Races
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/results/1/related
+Accept: application/json
+
+### Get Related Results for a Runner Within a Specific Event
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/results/1/related?eventId=5
+Accept: application/json
+
+### Get Divisions for a Race
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/divisions
+Accept: application/json
+
+### Get Course Map Image for a Race (204 if none uploaded)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/races/1/course-map
+Accept: application/json
+
+# ─────────────────────────────────────────────
+# HERO IMAGES (Public)
+# ─────────────────────────────────────────────
+
+### Get Recent Hero Carousel Images
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/hero-images
+Accept: application/json
+
+# ─────────────────────────────────────────────
+# CHAT (Public / Optional Auth)
+# ─────────────────────────────────────────────
+
+### Get Chat Status (enabled, requiresAuth)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/chat/status
+Accept: application/json
+
+### Send Chat Message (Non-Streaming)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/chat
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"message": "Who won the 2025 WDW Marathon?",
+	"context": null
+}
+
+### Stream Chat Message (SSE)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/chat/stream
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"message": "Who won the 2025 WDW Marathon?",
+	"context": null
+}
+
+### Clear Chat Conversation
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/chat/conversation
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# DLS (Public / Authenticated)
+# ─────────────────────────────────────────────
+
+### Get Upcoming DLS Races (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/races
+Accept: application/json
+
+### Get Declarations for a DLS Race (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/races/1/declarations
+Accept: application/json
+
+### Self-Declare for a DLS Race
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/declare
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"dlsRaceId": 1,
+	"bibNumber": 1234,
+	"isFirstDls": false,
+	"isGoingForKills": true,
+	"comments": "Let's go!"
+}
+
+### Get My Declarations for Multiple DLS Races
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/my-declarations?ids=1,2,3
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Update My DLS Declaration
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/declarations/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"bibNumber": 5678
+}
+
+### Delete My DLS Declaration
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/declarations/1
+Authorization: Bearer {{auth_token}}
+
+### Get DLS Result IDs for a Race (for kill chart highlighting, Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/dls/result-ids/1
+Accept: application/json
+
+# ─────────────────────────────────────────────
+# FOLLOWS (Authenticated)
+# ─────────────────────────────────────────────
+
+### Get My Follows
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/follows
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Search My Results by Display Name
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/follows/search?skip=0&limit=25
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get Follow Status for a Race Result
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/follows/status/1
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Follow a Race Result
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/follows
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"raceResultId": 1,
+	"followType": "Claimed",
+	"deadLastStarted": false
+}
+
+### Update a Follow (e.g. toggle DLS status)
+PATCH {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/follows/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"deadLastStarted": true
+}
+
+### Unfollow a Race Result
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/follows/1
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# COMMUNITY EVENTS (Public / Authenticated)
+# ─────────────────────────────────────────────
+
+### Get Paged Community Events (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events?page=1&pageSize=20
+Accept: application/json
+
+### Get Community Events with Filters
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events?year=2026&includePast=false&page=1&pageSize=20
+Accept: application/json
+
+### Get Upcoming Community Events for Sidebar (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/upcoming?count=10
+Accept: application/json
+
+### Get Available Years for Community Events (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/years
+Accept: application/json
+
+### Get Community Event by ID (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1
+Accept: application/json
+
+### Create Community Event
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"name": "Spring Training 5K",
+	"description": "A fun 5K run through the park.",
+	"location": "Orlando, FL",
+	"races": [
+		{
+			"name": "5K",
+			"distance": "FiveK",
+			"raceDate": "2026-04-01"
+		}
+	]
+}
+
+### Update Community Event
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"name": "Spring Training 5K (Updated)",
+	"description": "Updated description.",
+	"location": "Orlando, FL"
+}
+
+### Delete Community Event
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1
+Authorization: Bearer {{auth_token}}
+
+### Add Race to Community Event
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1/races
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"name": "10K",
+	"distance": "TenK",
+	"raceDate": "2026-04-01"
+}
+
+### Update Community Race
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/races/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"name": "10K (Updated)",
+	"raceDate": "2026-04-02"
+}
+
+### Delete Community Race
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/races/1
+Authorization: Bearer {{auth_token}}
+
+### Get Participants for a Community Event (Public)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1/participants
+Accept: application/json
+
+### Get My Participation for a Community Event
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1/my-participation
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Save Participation for a Community Event (batch upsert)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1/participate
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"participations": [
+		{ "raceId": 1, "isGoing": true }
+	]
+}
+
+### Withdraw All Participation from a Community Event
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/community/events/1/participate
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# USERS (Authenticated)
+# ─────────────────────────────────────────────
+
+### Get Current User
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Update Own Profile (display name only)
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"displayName": "Mickey Mouse"
+}
+
+### Delete Own Account
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me
+Authorization: Bearer {{auth_token}}
+
+### Register Push Token (call on app launch / after notification permission granted)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me/push-tokens
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"token": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]",
+	"platform": "ios"
+}
+
+### Unregister Push Token (call on logout or when notifications are disabled)
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me/push-tokens
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"token": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+}
+
+### Get Notification Preferences
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me/notifications/preferences
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Update Notification Preferences
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/users/me/notifications/preferences
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"raceResults": true,
+	"dlsDeclarations": true,
+	"communityEvents": true
+}
+
+# ─────────────────────────────────────────────
+# ADMIN — EVENTS
+# ─────────────────────────────────────────────
+
+### Preview Event (scrapes Track Shack page)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/events/preview?url=https://trackshackresults.com/disneysports/results/wdw/wdw2025/
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Submit Event
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/events/submit
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"url": "https://trackshackresults.com/disneysports/results/wdw/wdw2025/",
+	"name": "2025 Walt Disney World Marathon Weekend",
+	"races": [
+		{
+			"url": "https://trackshackresults.com/disneysports/results/wdw/wdw2025/wdwmar.php",
+			"name": "Marathon",
+			"distance": "FullMarathon",
+			"raceDate": "2025-01-12",
+			"shouldProcess": true
+		}
+	]
+}
+
+### Delete Event
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/events/1
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# ADMIN — RACES
+# ─────────────────────────────────────────────
+
+### Reparse Race
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/1/reparse
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Generate Race Statistics (synchronous)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/1/generate-stats
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Generate Race Statistics with Pass Recalculation (creates background job)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/1/generate-stats?recalculateIndividualResults=true
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Delete Race
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/1
+Authorization: Bearer {{auth_token}}
+
+### Upload Course Map Image (multipart/form-data — use a REST client that supports file uploads)
+# POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/1/course-map
+# Content-Type: multipart/form-data; boundary=----boundary
+# Authorization: Bearer {{auth_token}}
+# Max 20 MB; accepts JPEG, PNG, or WebP.
+# Resizes to full (max 1920px wide) and creates a 300px thumbnail automatically.
+
+### Delete Course Map Image
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/1/course-map
+Authorization: Bearer {{auth_token}}
+
+### Preview Divisions from Track Shack URL (Dev Only)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/preview/divisions?url=https://trackshackresults.com/disneysports/results/wdw/wdw2025/wdwmar.php
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Preview Results from Track Shack URL (Dev Only)
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/races/preview/results?url=https://trackshackresults.com/disneysports/results/wdw/wdw2025/wdwmar.php&division=M50-54
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# ADMIN — JOBS
+# ─────────────────────────────────────────────
+
+### Get Jobs by IDs (comma-separated)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/jobs?ids=1,2,3
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get Recent Jobs
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/jobs/recent?page=1&pageSize=5
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Cancel Job
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/jobs/1/cancel
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# ADMIN — USERS
+# ─────────────────────────────────────────────
+
+### Get Paged Users
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/users?page=1&pageSize=25
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Search Users
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/users?search=mickey&page=1&pageSize=25
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Get User by ID
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/users/1
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Update User
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/users/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"email": "mickey@disney.com",
+	"displayName": "Mickey Mouse",
+	"isAdmin": false
+}
+
+### Delete User
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/users/1
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# ADMIN — HERO IMAGES
+# ─────────────────────────────────────────────
+
+### Get All Hero Images
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/hero-images
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Upload Hero Image (multipart/form-data — use a REST client that supports file uploads)
+# POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/hero-images
+# Content-Type: multipart/form-data; boundary=----boundary
+# Authorization: Bearer {{auth_token}}
+
+### Delete Hero Image by Filename
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/hero-images/20250101120000000.jpg
+Authorization: Bearer {{auth_token}}
+
+# ─────────────────────────────────────────────
+# ADMIN — DLS
+# ─────────────────────────────────────────────
+
+### Get All DLS Races (including past)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/races?upcomingOnly=false
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Create DLS Race
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/races
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"name": "2026 WDW Marathon - Dead Last Start",
+	"raceDate": "2026-01-11",
+	"bibNumbers": "1001,1002,1003"
+}
+
+### Update DLS Race
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/races/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"name": "2026 WDW Marathon - Dead Last Start (Updated)",
+	"raceDate": "2026-01-11"
+}
+
+### Delete DLS Race
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/races/1
+Authorization: Bearer {{auth_token}}
+
+### Get Declarations for a DLS Race (Admin)
+GET {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/races/1/declarations
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+### Update Declaration (Admin Override)
+PUT {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/declarations/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+	"bibNumber": 9999
+}
+
+### Delete Declaration (Admin Override)
+DELETE {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/declarations/1
+Authorization: Bearer {{auth_token}}
+
+### Process DLS Declarations after Race Scrape
+POST {{Falchion.Villains.Vault.Api_HostAddress}}/api/v1.0/admin/dls/races/1/process/42
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+###
