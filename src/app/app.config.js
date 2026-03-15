@@ -1,0 +1,182 @@
+/**
+ * Expo App Configuration
+ * 
+ * This file loads environment variables from .env files and makes them
+ * available throughout the app via Constants.expoConfig.extra
+ * 
+ * Priority order: .env.local > .env > defaults
+ */
+
+const path = require('path');
+const fs = require('fs');
+
+/**
+ * Load environment variables from .env files
+ * Manually parse to avoid needing dotenv package
+ */
+function loadEnvFile(filePath) {
+	if (!fs.existsSync(filePath)) {
+		return {};
+	}
+
+	const content = fs.readFileSync(filePath, 'utf-8');
+	const env = {};
+
+	content.split('\n').forEach(line => {
+		// Skip comments and empty lines
+		line = line.trim();
+		if (!line || line.startsWith('#')) return;
+
+		// Parse KEY=value
+		const match = line.match(/^([^=]+)=(.*)$/);
+		if (match) {
+			const key = match[1].trim();
+			let value = match[2].trim();
+
+			// Remove quotes if present
+			if ((value.startsWith('"') && value.endsWith('"')) ||
+				(value.startsWith("'") && value.endsWith("'"))) {
+				value = value.slice(1, -1);
+			}
+
+			env[key] = value;
+		}
+	});
+
+	return env;
+}
+
+// Load .env and .env.local (local takes precedence)
+// Determine which .env file to use based on ENV_NAME variable
+const envName = process.env.ENV_NAME || 'local';
+const envLocalPath = path.resolve(__dirname, `.env.${envName}`);
+const envPath = path.resolve(__dirname, '.env');
+
+// Load .env and environment-specific file (specific takes precedence)
+const env = {
+	...loadEnvFile(envPath),
+	...loadEnvFile(envLocalPath),
+};
+console.log(`[app.config.js] Loading environment: .env.${envName}`);
+
+// Extract EXPO_PUBLIC_* variables
+const expoProjectId = env.EXPO_PUBLIC_PROJECT_ID;
+const auth0Domain = env.EXPO_PUBLIC_AUTH0_DOMAIN || '';
+const auth0WebClientId = env.EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID || '';
+const auth0NativeClientId = env.EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID || '';
+const auth0Audience = env.EXPO_PUBLIC_AUTH0_AUDIENCE || '';
+const apiUrl = env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+const clarityWebProjectId = env.EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID || '';
+const clarityNativeProjectId = env.EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID || '';
+const disableDlsDeclarations = env.EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS || 'false';
+const disableCommunityEvents = env.EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS || 'false';
+
+// console.log('[app.config.js] Loaded environment variables:', {
+// 	expoProjectId: expoProjectId ? expoProjectId : '✗',
+// 	auth0Domain: auth0Domain ? '✓' : '✗',
+// 	auth0WebClientId: auth0WebClientId ? '✓' : '✗',
+// 	auth0NativeClientId: auth0NativeClientId ? '✓' : '✗',
+// 	apiUrl: apiUrl,
+// 	clarityWebProjectId: clarityWebProjectId ? '✓' : '✗',
+// 	clarityNativeProjectId: clarityNativeProjectId ? '✓' : '✗',
+// 	disableDlsDeclarations: disableDlsDeclarations === 'true' ? 'true' : 'false',
+// 	disableCommunityEvents: disableCommunityEvents === 'true' ? 'true' : 'false',
+// });
+
+module.exports = {
+	expo: {
+		name: 'Villains Vault',
+		slug: 'villains-vault',
+		version: '1.0.0',
+		orientation: 'default',
+		icon: './assets/villains-icon.png',
+		userInterfaceStyle: 'automatic',
+		scheme: 'villains-vault',
+		newArchEnabled: true,
+		updates: {
+			url: `https://u.expo.dev/${expoProjectId}`,
+		},
+		runtimeVersion: {
+			policy: 'appVersion',
+		},
+		splash: {
+			image: './assets/villains-splash-icon.png',
+			resizeMode: 'contain',
+			backgroundColor: '#000000',
+		},
+		developmentClient: {
+			silentLaunch: false,
+		},
+		ios: {
+			supportsTablet: true,
+			bundleIdentifier: 'com.falchion.villains.vault',
+		},
+		android: {
+			adaptiveIcon: {
+				foregroundImage: './assets/villains-adaptive-icon.png',
+				backgroundColor: '#000000',
+			},
+			edgeToEdgeEnabled: true,
+			predictiveBackGestureEnabled: true,
+			jsEngine: 'hermes',
+			package: 'com.falchion.villains.vault',
+			permissions: ['android.permission.POST_NOTIFICATIONS'],
+			intentFilters: [
+				{
+					action: 'VIEW',
+					category: ['BROWSABLE', 'DEFAULT'],
+					data: {
+						scheme: 'villains-vault',
+						host: 'callback',
+					},
+				},
+			],
+			googleServicesFile: "./google-services.json",
+		},
+		web: {
+			bundler: 'metro',
+			favicon: './assets/favicon.png',
+		},
+		plugins: [
+			'expo-router',
+			[
+				'expo-notifications',
+				{
+					icon: './assets/villains-notification-icon.png',
+					color: '#9333ea',
+					defaultChannel: 'default',
+				},
+			],
+			[
+				'react-native-auth0',
+				{
+					domain: auth0Domain,
+				},
+			],
+			[
+				'./plugins/withGradleWrapper',
+				{ gradleVersion: '8.13' },
+			],
+		],
+		experiments: {
+			typedRoutes: true,
+		},
+		extra: {
+			router: {},
+			eas: {
+				projectId: expoProjectId,
+			},
+			// Environment variables accessible via Constants.expoConfig.extra
+			auth0Domain,
+			auth0WebClientId,
+			auth0NativeClientId,
+			auth0Audience,
+			apiUrl,
+			clarityWebProjectId,
+			clarityNativeProjectId,
+			disableDlsDeclarations,
+			disableCommunityEvents,
+			expoProjectId,
+		},
+	},
+};

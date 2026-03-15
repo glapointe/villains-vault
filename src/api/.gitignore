@@ -1,0 +1,65 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Dd]ist/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+
+# Visual Studio Code
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ReSharper
+.idea/
+*.sln.iml
+_ReSharper*/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# Rider
+.idea/
+*.sln.iml
+*.VC.db
+
+# Local environment variables
+.env
+.env.local
+appsettings.Development.json
+appsettings.*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Miscellaneous
+*.log
+*.swp
+*.swo

@@ -1,0 +1,25 @@
+# Ignore build results and other generated files
+
+.alpackages/
+.snapshots/
+
+# Visual Studio cache/options
+.vs/
+
+# Visual Studio Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Miscellaneous
+*.log
+*.swp
+*.swo
+
+# Scripts
+/scripts/
+/dist/
+src/app/eas.json
+src/app/villains-vault-*-firebase-adminsdk-*

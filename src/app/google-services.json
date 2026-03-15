@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "911131228720",
+    "project_id": "villains-vault-488519",
+    "storage_bucket": "villains-vault-488519.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911131228720:android:4e871af790b68a4dfbcbf5",
+        "android_client_info": {
+          "package_name": "com.falchion.villains.vault"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "911131228720-06n0bc2f3c939dlvp038cvokcn7km6f7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBokET1s6VdtfBTFn7Z8inKy8eZVtrVy_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "911131228720-06n0bc2f3c939dlvp038cvokcn7km6f7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

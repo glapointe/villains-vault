@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>2aac01d4-8930-41b5-b5ef-4a37a3e97e01</UserSecretsId>
+    
+    <!-- Disable default exclusions for node_modules in wwwroot -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);!wwwroot\**</DefaultItemExcludes>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.AI.Projects" Version="2.0.0-beta.1" />
+    <PackageReference Include="Azure.Identity" Version="1.19.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+    <PackageReference Include="Microsoft.Agents.AI.AzureAI" Version="1.0.0-rc2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.1.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <!-- Include web.config in publish output -->
+  <ItemGroup>
+    <Content Update="web.config" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Explicitly include ALL wwwroot content, including node_modules -->
+  <ItemGroup>
+    <!-- Include all wwwroot files recursively -->
+    <Content Include="wwwroot\**\*.*" CopyToPublishDirectory="PreserveNewest" />
+    
+    <!-- Specifically ensure node_modules is included (overrides default exclusions) -->
+    <Content Include="wwwroot\assets\node_modules\**\*.*" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
