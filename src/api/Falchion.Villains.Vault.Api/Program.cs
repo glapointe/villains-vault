@@ -1,17 +1,17 @@
+using Falchion.Villains.Vault.Api.Authorization;
+using Falchion.Villains.Vault.Api.Data;
+using Falchion.Villains.Vault.Api.GraphQL;
+using Falchion.Villains.Vault.Api.Repositories;
+using Falchion.Villains.Vault.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using Microsoft.Extensions.FileProviders;
 using System.Threading.Channels;
-using ModelContextProtocol.AspNetCore;
-using Falchion.Villains.Vault.Api.Authorization;
-using Falchion.Villains.Vault.Api.Data;
-using Falchion.Villains.Vault.Api.Repositories;
-using Falchion.Villains.Vault.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +97,26 @@ builder.Services.AddSingleton<McpCacheService>();
 // Register response cache middleware for VaryByQueryKeys support
 builder.Services.AddResponseCaching();
 
+// Register GraphQL server with projections, filtering, sorting, and EF Core integration
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+	.AddType<Falchion.Villains.Vault.Api.GraphQL.Types.EventType>()
+	.AddType<Falchion.Villains.Vault.Api.GraphQL.Types.RaceType>()
+	.AddType<Falchion.Villains.Vault.Api.GraphQL.Types.RaceResultType>()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting()
+    // Limit query nesting depth to prevent deeply nested or fan-out queries.
+    .AddMaxExecutionDepthRule(10, skipIntrospectionFields: true)
+    .ModifyPagingOptions(o =>
+    {
+        o.MaxPageSize = 500;
+        o.DefaultPageSize = 50;
+        o.IncludeTotalCount = true;
+    })
+    .RegisterDbContextFactory<ApplicationDbContext>();
+
 // Register MCP server for AI assistant integrations (Claude, VS Code, etc.)
 builder.Services
 	.AddMcpServer()
@@ -115,8 +135,14 @@ builder.Services.AddRateLimiter(options =>
 		limiter.Window = TimeSpan.FromMinutes(1);
 	});
 
+    options.AddFixedWindowLimiter("graphql", limiter =>
+    {
+        limiter.PermitLimit = 60;
+        limiter.Window = TimeSpan.FromMinutes(1);
+    });
+    
 	// Authenticated chat users get a higher limit
-	options.AddFixedWindowLimiter("chat-auth", limiter =>
+    options.AddFixedWindowLimiter("chat-auth", limiter =>
 	{
 		limiter.PermitLimit = chatAuthRate;
 		limiter.Window = TimeSpan.FromMinutes(1);
@@ -349,6 +375,9 @@ app.MapControllers();
 
 // Map MCP endpoint for AI assistant integrations (Streamable HTTP + legacy SSE)
 app.MapMcp("/mcp").RequireRateLimiting("mcp");
+
+app.MapNitroApp("/api/graphql/ui");
+app.MapGraphQL("/api/graphql").RequireRateLimiting("graphql");
 
 // Map health check endpoint
 app.MapHealthChecks("/api/health");

@@ -54,6 +54,7 @@
 - **Entity Framework Core** - ORM with SQL Server (LocalDB for development, Azure SQL for production)
 - **JWT Authentication** - Secure API endpoints
 - **OpenAPI/Swagger** - [Interactive API documentation](https://vault.villains.run/swagger)
+- **GraphQL** - [Flexible query API with filtering, sorting, and pagination](docs/GRAPHQL_API.md)
 - **Model Context Protocol (MCP)** - [Standardized API response format for seamless AI integration](docs/MCP_INTEGRATION.md)
 - **Background Services** - Automated data scraping and synchronization
 
@@ -112,6 +113,7 @@ Detailed documentation is available in the `/docs` directory:
 - **[Auth0 Setup Guide](docs/AUTH0_SOCIAL_SETUP.md)** - Configure social authentication
 - **[Admin User Management](docs/ADMIN_USER_SETUP.md)** - User roles and permissions
 - **[MCP Integration](docs/MCP_INTEGRATION.md)** - How the Model Context Protocol is implemented for AI integration
+- **[GraphQL API](docs/GRAPHQL_API.md)** - Connecting to the GraphQL API, available objects, and example queries
 - **[Azure SQL to LocalDB Migration](docs/AZURE_SQL_TO_LOCALDB.md)** - Steps to migrate the database from Azure SQL to LocalDB for local development
 
 ## 🏗️ Architecture
