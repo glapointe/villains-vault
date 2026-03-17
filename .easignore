@@ -1,0 +1,59 @@
+# .easignore - located at the git repo root (REQUIRED by EAS)
+# When this file is present, EAS ignores ALL .gitignore files and uses ONLY this file.
+# Therefore this file must cover everything from all .gitignore files in the repo.
+
+# ============================================================
+# GIT
+# ============================================================
+.git/
+
+# ============================================================
+# ROOT .gitignore rules
+# ============================================================
+.alpackages/
+.snapshots/
+.vs/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+/scripts/
+/dist/
+src/app/villains-vault-*-firebase-adminsdk-*
+
+# ============================================================
+# src/app/.gitignore rules
+# ============================================================
+src/app/node_modules/
+src/app/.expo/
+src/app/dist/
+src/app/web-build/
+src/app/.kotlin/
+src/app/*.orig.*
+src/app/*.jks
+src/app/*.p8
+src/app/*.p12
+src/app/*.key
+src/app/*.mobileprovision
+src/app/.metro-health-check*
+src/app/npm-debug.*
+src/app/yarn-debug.*
+src/app/yarn-error.*
+src/app/.DS_Store
+src/app/*.pem
+src/app/.env.*
+src/app/.env
+src/app/*.tsbuildinfo
+src/app/ios/
+# Android local build artifacts (2GB+ of build cache, not needed by EAS)
+src/app/android/app/build/
+src/app/android/app/.cxx/
+src/app/android/.gradle/
+src/app/android/build/
+
+# ============================================================
+# src/api - .NET backend, not involved in the Expo build at all
+# ============================================================
+src/api/
