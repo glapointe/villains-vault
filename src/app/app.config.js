@@ -60,16 +60,18 @@ const env = {
 console.log(`[app.config.js] Loading environment: .env.${envName}`);
 
 // Extract EXPO_PUBLIC_* variables
-const expoProjectId = env.EXPO_PUBLIC_PROJECT_ID;
-const auth0Domain = env.EXPO_PUBLIC_AUTH0_DOMAIN || '';
-const auth0WebClientId = env.EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID || '';
-const auth0NativeClientId = env.EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID || '';
-const auth0Audience = env.EXPO_PUBLIC_AUTH0_AUDIENCE || '';
-const apiUrl = env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
-const clarityWebProjectId = env.EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID || '';
-const clarityNativeProjectId = env.EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID || '';
-const disableDlsDeclarations = env.EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS || 'false';
-const disableCommunityEvents = env.EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS || 'false';
+// process.env takes priority (injected by EAS build profile env blocks),
+// then fall back to values loaded from .env files on disk.
+const expoProjectId = process.env.EXPO_PUBLIC_PROJECT_ID || env.EXPO_PUBLIC_PROJECT_ID;
+const auth0Domain = process.env.EXPO_PUBLIC_AUTH0_DOMAIN || env.EXPO_PUBLIC_AUTH0_DOMAIN || '';
+const auth0WebClientId = process.env.EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID || env.EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID || '';
+const auth0NativeClientId = process.env.EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID || env.EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID || '';
+const auth0Audience = process.env.EXPO_PUBLIC_AUTH0_AUDIENCE || env.EXPO_PUBLIC_AUTH0_AUDIENCE || '';
+const apiUrl = process.env.EXPO_PUBLIC_API_URL || env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+const clarityWebProjectId = process.env.EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID || env.EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID || '';
+const clarityNativeProjectId = process.env.EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID || env.EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID || '';
+const disableDlsDeclarations = process.env.EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS || env.EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS || 'false';
+const disableCommunityEvents = process.env.EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS || env.EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS || 'false';
 
 // console.log('[app.config.js] Loaded environment variables:', {
 // 	expoProjectId: expoProjectId ? expoProjectId : '✗',
