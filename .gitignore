@@ -21,5 +21,4 @@ Thumbs.db
 # Scripts
 /scripts/
 /dist/
-src/app/eas.json
 src/app/villains-vault-*-firebase-adminsdk-*
