@@ -8,7 +8,7 @@
 import { View, Text, ScrollView } from 'react-native';
 import { useAuth } from '../../hooks';
 import { useTheme } from '../../contexts/ThemeContext';
-import { getThemedColors } from '../../theme';
+import { getThemedColors, spacing } from '../../theme';
 import { Redirect, useRouter } from 'expo-router';
 import { useEffect, useState, Suspense } from 'react';
 import { api, setAuthToken } from '../../services/api';
@@ -130,141 +130,143 @@ export default function AdminScreen(): React.ReactElement {
 	}
 
 	return (
-		<ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}>
-			<View style={styles.content}>
-				<Card style={styles.headerCard}>
-					<Text style={[styles.title, { color: colors.textPrimary }]}>Admin Dashboard</Text>
-					<Text style={[styles.subtitle, { color: colors.textSecondary }]}>Manage races and scraping jobs</Text>
-				</Card>
-
-				{/* Event Submission */}
-				<View style={styles.featureCardsContainer}>
-					<Card style={styles.featureCard}>
-						<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Submit Event</Text>
-						<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
-							Submit a new race weekend event for parsing
-						</Text>
-						<Button
-							title="Submit Event"
-							onPress={() => setIsEventPanelOpen(true)}
-							style={styles.actionButton}
-						/>
+		<View style={{ flex: 1 }}>
+			<View style={{ flexGrow: 1, paddingBottom: spacing.lg }}>
+				<View style={styles.content}>
+					<Card style={styles.headerCard}>
+						<Text style={[styles.title, { color: colors.textPrimary }]}>Admin Dashboard</Text>
+						<Text style={[styles.subtitle, { color: colors.textSecondary }]}>Manage races and scraping jobs</Text>
 					</Card>
 
-					<Card style={styles.featureCard}>
-						<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Background Services</Text>
-						<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
-							Monitor scraper health and job queue
-						</Text>
-						<Button
-							title="View Recent Jobs"
-							onPress={handleOpenRecentJobs}
-							style={styles.actionButton}
-						/>
-					</Card>
+					{/* Event Submission */}
+					<View style={styles.featureCardsContainer}>
+						<Card style={styles.featureCard}>
+							<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Submit Event</Text>
+							<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
+								Submit a new race weekend event for parsing
+							</Text>
+							<Button
+								title="Submit Event"
+								onPress={() => setIsEventPanelOpen(true)}
+								style={styles.actionButton}
+							/>
+						</Card>
 
-					<Card style={styles.featureCard}>
-						<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Hero Images</Text>
-						<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
-							Manage carousel images on the home page
-						</Text>
-						<Button
-							title="Manage Images"
-							onPress={() => setIsHeroImagePanelOpen(true)}
-							style={styles.actionButton}
-						/>
-					</Card>
+						<Card style={styles.featureCard}>
+							<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Background Services</Text>
+							<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
+								Monitor scraper health and job queue
+							</Text>
+							<Button
+								title="View Recent Jobs"
+								onPress={handleOpenRecentJobs}
+								style={styles.actionButton}
+							/>
+						</Card>
 
-					<Card style={styles.featureCard}>
-						<Text style={[text.featureTitle, { color: colors.textPrimary }]}>DLS Declarations</Text>
-						<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
-							Manage DLS races and runner declarations
-						</Text>
-						<Button
-							title="Manage DLS"
-							onPress={() => setIsDlsPanelOpen(true)}
-							style={styles.actionButton}
-						/>
-					</Card>
+						<Card style={styles.featureCard}>
+							<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Hero Images</Text>
+							<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
+								Manage carousel images on the home page
+							</Text>
+							<Button
+								title="Manage Images"
+								onPress={() => setIsHeroImagePanelOpen(true)}
+								style={styles.actionButton}
+							/>
+						</Card>
 
+						<Card style={styles.featureCard}>
+							<Text style={[text.featureTitle, { color: colors.textPrimary }]}>DLS Declarations</Text>
+							<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
+								Manage DLS races and runner declarations
+							</Text>
+							<Button
+								title="Manage DLS"
+								onPress={() => setIsDlsPanelOpen(true)}
+								style={styles.actionButton}
+							/>
+						</Card>
+
+						<Card style={styles.featureCard}>
+							<Text style={[text.featureTitle, { color: colors.textPrimary }]}>User Management</Text>
+							<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
+								Manage user accounts, roles, and permissions
+							</Text>
+							<Button
+								title="Manage Users"
+								onPress={() => router.push('/(tabs)/users')}
+								style={styles.actionButton}
+							/>
+						</Card>
+					</View>
+					{accessToken && (
+						<AdminEventsList
+							selectedYear={new Date().getFullYear()}
+							showYearFilter={true}
+							adminMode={true}
+							isAdmin={isAdmin}
+							accessToken={accessToken}
+						/>
+					)}
+
+					{/* Cache Bypass Control */}
 					<Card style={styles.featureCard}>
-						<Text style={[text.featureTitle, { color: colors.textPrimary }]}>User Management</Text>
-						<Text style={[text.featureDescription, { color: colors.textSecondary }]}>
-							Manage user accounts, roles, and permissions
-						</Text>
-						<Button
-							title="Manage Users"
-							onPress={() => router.push('/(tabs)/users')}
-							style={styles.actionButton}
+						<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Developer Options</Text>
+						<Checkbox
+							label="Bypass Server Cache"
+							description="When enabled, API requests will skip cached data and fetch fresh results from the database. Useful for immediately viewing results after job completion."
+							checked={bypassCache}
+							onToggle={handleCacheBypassToggle}
 						/>
 					</Card>
 				</View>
+				{/* Event Submission Panel - Lazy loaded */}
 				{accessToken && (
-					<AdminEventsList
-						selectedYear={new Date().getFullYear()}
-						showYearFilter={true}
-						adminMode={true}
-						isAdmin={isAdmin}
-						accessToken={accessToken}
-					/>
+					<Suspense fallback={null}>
+						<EventSubmissionPanel
+							isOpen={isEventPanelOpen}
+							onClose={() => setIsEventPanelOpen(false)}
+							onJobsCreated={handleJobsCreated}
+							accessToken={accessToken}
+						/>
+					</Suspense>
 				)}
 
-				{/* Cache Bypass Control */}
-				<Card style={styles.featureCard}>
-					<Text style={[text.featureTitle, { color: colors.textPrimary }]}>Developer Options</Text>
-					<Checkbox
-						label="Bypass Server Cache"
-						description="When enabled, API requests will skip cached data and fetch fresh results from the database. Useful for immediately viewing results after job completion."
-						checked={bypassCache}
-						onToggle={handleCacheBypassToggle}
-					/>
-				</Card>
+				{/* Job Status Panel - Lazy loaded */}
+				{accessToken && (
+					<Suspense fallback={null}>
+						<JobStatusPanel
+							isOpen={isJobsPanelOpen}
+							onClose={() => setIsJobsPanelOpen(false)}
+							jobIds={jobIds}
+							accessToken={accessToken}
+						/>
+					</Suspense>
+				)}
+
+				{/* Hero Image Panel - Lazy loaded */}
+				{accessToken && (
+					<Suspense fallback={null}>
+						<HeroImagePanel
+							isOpen={isHeroImagePanelOpen}
+							onClose={() => setIsHeroImagePanelOpen(false)}
+							accessToken={accessToken}
+						/>
+					</Suspense>
+				)}
+
+				{/* DLS Management Panel - Lazy loaded */}
+				{accessToken && (
+					<Suspense fallback={null}>
+						<DlsManagementPanel
+							isOpen={isDlsPanelOpen}
+							onClose={() => setIsDlsPanelOpen(false)}
+							accessToken={accessToken}
+						/>
+					</Suspense>
+				)}
 			</View>
-			{/* Event Submission Panel - Lazy loaded */}
-			{accessToken && (
-				<Suspense fallback={null}>
-					<EventSubmissionPanel
-						isOpen={isEventPanelOpen}
-						onClose={() => setIsEventPanelOpen(false)}
-						onJobsCreated={handleJobsCreated}
-						accessToken={accessToken}
-					/>
-				</Suspense>
-			)}
-
-			{/* Job Status Panel - Lazy loaded */}
-			{accessToken && (
-				<Suspense fallback={null}>
-					<JobStatusPanel
-						isOpen={isJobsPanelOpen}
-						onClose={() => setIsJobsPanelOpen(false)}
-						jobIds={jobIds}
-						accessToken={accessToken}
-					/>
-				</Suspense>
-			)}
-
-			{/* Hero Image Panel - Lazy loaded */}
-			{accessToken && (
-				<Suspense fallback={null}>
-					<HeroImagePanel
-						isOpen={isHeroImagePanelOpen}
-						onClose={() => setIsHeroImagePanelOpen(false)}
-						accessToken={accessToken}
-					/>
-				</Suspense>
-			)}
-
-			{/* DLS Management Panel - Lazy loaded */}
-			{accessToken && (
-				<Suspense fallback={null}>
-					<DlsManagementPanel
-						isOpen={isDlsPanelOpen}
-						onClose={() => setIsDlsPanelOpen(false)}
-						accessToken={accessToken}
-					/>
-				</Suspense>
-			)}
-		</ScrollView>
+		</View>
 	);
 }

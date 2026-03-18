@@ -53,32 +53,34 @@ export default function DashboardScreen(): React.ReactElement {
 	}
 
 	return (
-		<ScrollView style={[styles.container, themedStyles.container]} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="always">
-			<View style={[styles.content, themedStyles.content]}>
-				<SectionHeader
-					title="My Dashboard"
-					subTitle="View your claimed and followed results."
-					isPageHeader
-				/>
-				<FollowedResultsList
-					claimed={claimed}
-					interested={interested}
-					loading={loading}
-					error={error}
-					actionLoading={actionLoading}
-					yearOptions={yearOptions}
-					seriesOptions={seriesOptions}
-					filterYear={filterYear}
-					filterSeries={filterSeries}
-					onFilterYearChange={setFilterYear}
-					onFilterSeriesChange={setFilterSeries}
-					onUnfollow={unfollowResult}
-					onClaim={claimResult}
-					onClaimBatch={claimResults}
-					onSearchMyResults={searchMyResults}
-					onUpdateFollow={updateFollow}
-				/>
+		<View style={[styles.container, themedStyles.container]}>
+			<View style={styles.contentContainer}>
+				<View style={[styles.content, themedStyles.content]}>
+					<SectionHeader
+						title="My Dashboard"
+						subTitle="View your claimed and followed results."
+						isPageHeader
+					/>
+					<FollowedResultsList
+						claimed={claimed}
+						interested={interested}
+						loading={loading}
+						error={error}
+						actionLoading={actionLoading}
+						yearOptions={yearOptions}
+						seriesOptions={seriesOptions}
+						filterYear={filterYear}
+						filterSeries={filterSeries}
+						onFilterYearChange={setFilterYear}
+						onFilterSeriesChange={setFilterSeries}
+						onUnfollow={unfollowResult}
+						onClaim={claimResult}
+						onClaimBatch={claimResults}
+						onSearchMyResults={searchMyResults}
+						onUpdateFollow={updateFollow}
+					/>
+				</View>
 			</View>
-		</ScrollView>
+		</View>
 	);
 }

@@ -184,54 +184,55 @@ export default function RaceDashboardScreen(): React.ReactElement {
 	);
 
     return (
-        <ScrollView style={[styles.container, themedStyles.container]} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="always">
-            <View style={[styles.content, themedStyles.content]}>
-                {/* Race Header */}
-				<SectionHeader
-					isPageHeader
-					leftContent={leftHeader}
-					rightContent={isAdmin && Platform.OS === 'web' && (
-						<View style={styles.adminToolbar}>
-							<Suspense fallback={null}>
-								<BulkKillChart race={race} />
+        <View style={[styles.container, themedStyles.container]}>
+			<View style={styles.contentContainer}>
+				<View style={[styles.content, themedStyles.content]}>
+					{/* Race Header */}
+					<SectionHeader
+						isPageHeader
+						leftContent={leftHeader}
+						rightContent={isAdmin && Platform.OS === 'web' && (
+							<View style={styles.adminToolbar}>
+								<Suspense fallback={null}>
+									<BulkKillChart race={race} />
+								</Suspense>
+							</View>
+						)}
+					/>
+
+					{/* AI Chat Prompt Bar */}
+					<View style={styles.promptContainer}>
+						<ChatPromptBar
+							mode="modal"
+							context={{ raceId: race.id, pageName: 'race' }}
+							placeholder={`Ask about ${race.name}...`}
+						/>
+					</View>
+
+					{/* Race Statistics Dashboard - Lazy loaded */}
+					{raceStats && (
+						<View style={styles.statsContainer}>
+							<Suspense fallback={<LoadingSpinner />}>
+								<RaceStatsDashboard stats={raceStats} race={race} />
 							</Suspense>
 						</View>
 					)}
-				/>
 
-				{/* AI Chat Prompt Bar */}
-				<View style={styles.promptContainer}>
-					<ChatPromptBar
-						mode="modal"
-						context={{ raceId: race.id, pageName: 'race' }}
-						placeholder={`Ask about ${race.name}...`}
-					/>
+					{/* Weather Data */}
+					<Weather raceId={race.id} />
+
+
+					{/* Results Grid with Page Padding */}
+					<View style={styles.gridContainer}>
+						<RaceResultsGrid
+							race={race}
+							initialPageSize={50}
+							pageSizeOptions={[25, 50, 100, 200, 500]}
+							onResultPress={(result) => router.push(`/results/${result.id}`)}
+						/>
+					</View>
 				</View>
-
-                {/* Race Statistics Dashboard - Lazy loaded */}
-                {raceStats && (
-                    <View style={styles.statsContainer}>
-                        <Suspense fallback={<LoadingSpinner />}>
-							<RaceStatsDashboard stats={raceStats} race={race} />
-						</Suspense>
-                    </View>
-                )}
-
-                {/* Weather Data */}
-                <Weather raceId={race.id} />
-
-
-                {/* Results Grid with Page Padding */}
-                <View style={styles.gridContainer}>
-                    <RaceResultsGrid
-                        race={race}
-                        initialPageSize={50}
-                        pageSizeOptions={[25, 50, 100, 200, 500]}
-                        onResultPress={(result) => router.push(`/results/${result.id}`)}
-                    />
-                </View>
-            </View>
-
-        </ScrollView>
+			</View>
+        </View>
     );
 }
