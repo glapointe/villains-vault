@@ -4,12 +4,27 @@
  * Styles for the course map thumbnail and full-screen lightbox modal.
  */
 
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { spacing, typography, borderRadius } from '../../../theme';
 import type { ThemeColors } from '../../../theme';
 
 /** Height used for the inline thumbnail — width is computed from aspectRatio at runtime */
 export const THUMBNAIL_HEIGHT = 75;
+
+/** Height of the lightbox card header row. */
+export const HEADER_HEIGHT = 52;
+
+/**
+ * Computes fixed lightbox card dimensions from the current window size.
+ * Call this inside the component with values from useWindowDimensions() so
+ * the dialog resizes correctly on device rotation.
+ */
+export function getCardDimensions(winWidth: number, winHeight: number) {
+	const cardWidth = Math.min(winWidth * 0.92, 720);
+	const cardHeight = Math.min(winHeight * 0.85, 600);
+	const bodyHeight = cardHeight - HEADER_HEIGHT;
+	return { cardWidth, cardHeight, bodyHeight };
+}
 
 /**
  * Theme-independent structural styles
@@ -36,23 +51,31 @@ export const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.8)',
 		alignItems: 'center',
 		justifyContent: 'center',
-		padding: spacing.lg,
+	},
+	overlayBackdrop: {
+		...StyleSheet.absoluteFillObject,
 	},
 	card: {
+		// width/height applied as live inline styles via useWindowDimensions() in the component.
 		borderRadius: borderRadius.lg,
 		borderWidth: 1,
 		overflow: 'hidden',
-		width: Math.min(Dimensions.get('window').width * 0.92, 900),
-		maxHeight: Math.min(Dimensions.get('window').height * 0.88, 900),
 		flexDirection: 'column',
 	},
 	cardHeader: {
+		height: HEADER_HEIGHT,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.sm,
 		borderBottomWidth: 1,
+	},
+	/** Clips zoomed/panned content - width/height injected inline at render time. */
+	imageBody: {
+		overflow: 'hidden',
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	cardTitle: {
 		fontSize: typography.fontSize.base,
@@ -90,17 +113,6 @@ export const styles = StyleSheet.create({
 		fontWeight: typography.fontWeight.bold,
 		lineHeight: typography.fontSize.base * typography.lineHeight.normal,
 	},
-	scrollView: {
-		flex: 1,
-	},
-	scrollContent: {
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	fullImage: {
-		width: Math.min(Dimensions.get('window').width * 0.92, 900),
-		height: Math.min(Dimensions.get('window').width * 0.92, 900) / (16 / 9),
-	},
 });
 
 /**
@@ -136,3 +148,4 @@ export const getThemedStyles = (colors: ThemeColors) => StyleSheet.create({
 		color: colors.textPrimary,
 	},
 });
+

@@ -2,20 +2,32 @@
  * Course Map Viewer Component
  *
  * Renders a compact thumbnail for a race's course map image.
- * Tapping/clicking the thumbnail opens a full-screen lightbox with:
- *   - Web: +/− zoom controls and pointer drag-to-pan
- *   - Native: pinch-to-zoom via ScrollView
+ * Tapping/clicking the thumbnail opens a fixed-size lightbox with:
+ *   - Web: +/− zoom buttons + mouse drag-to-pan via CSS transform
+ *   - Native: pinch-to-zoom + drag-to-pan via RNGH + Reanimated; double-tap to reset
  *
+ * The dialog has a fixed size on both platforms — it never resizes when zooming.
  * Fetches its own data given a raceId — no parent state required.
  */
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Image, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Modal, Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+
+/** Typed wrapper to fix Animated.View children type issue with reanimated v4 */
+const AnimatedView = Animated.View as React.ComponentType<any>;
+
 import { useTheme } from '../../../contexts/ThemeContext';
 import { getThemedColors } from '../../../theme';
 import { api } from '../../../services/api';
 import type { CourseMapImage } from '../../../models';
-import { styles, getThemedStyles, THUMBNAIL_HEIGHT } from './CourseMapViewer.styles';
+import {
+    styles,
+    getThemedStyles,
+    THUMBNAIL_HEIGHT,
+    getCardDimensions,
+} from './CourseMapViewer.styles';
 
 export interface CourseMapViewerProps {
     /** Numeric race ID used to fetch the course map */
@@ -33,17 +45,139 @@ export function CourseMapViewer({ raceId }: CourseMapViewerProps): React.ReactEl
     const colors = getThemedColors(isDark);
     const themedStyles = useMemo(() => getThemedStyles(colors), [colors]);
 
+    // Live dimensions — updates automatically on rotation.
+    const { width: winWidth, height: winHeight } = useWindowDimensions();
+    const { cardWidth, cardHeight, bodyHeight } = useMemo(
+        () => getCardDimensions(winWidth, winHeight),
+        [winWidth, winHeight],
+    );
+
     const [courseMap, setCourseMap] = useState<CourseMapImage | null>(null);
     const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [lightboxZoom, setLightboxZoom] = useState(1);
 
-    /** Tracks pointer position for drag-to-pan on web */
-    const panRef = useRef<{
-        scrollLeft: number;
-        scrollTop: number;
-        startX: number;
-        startY: number;
-    } | null>(null);
+    // ── Web zoom + pan state ──────────────────────────────────────────────────
+    const [webZoom, setWebZoom] = useState(1);
+    const [webPanX, setWebPanX] = useState(0);
+    const [webPanY, setWebPanY] = useState(0);
+    const webDragRef = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
+    const isDraggingRef = useRef(false);
+
+    // Clamp pan whenever zoom decreases so the image never ends up stranded
+    // outside the visible area. At zoom=1 the max is 0, which recenters the image.
+    useEffect(() => {
+        const maxX = cardWidth * (webZoom - 1) / 2;
+        const maxY = bodyHeight * (webZoom - 1) / 2;
+        setWebPanX(px => Math.max(-maxX, Math.min(maxX, px)));
+        setWebPanY(py => Math.max(-maxY, Math.min(maxY, py)));
+    }, [webZoom, cardWidth, bodyHeight]);
+
+    // ── Native pinch + pan (RNGH + Reanimated) ───────────────────────────────
+    // Hooks must be called unconditionally — they're no-ops on web.
+    const scale = useSharedValue(1);
+    const savedScale = useSharedValue(1);
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
+    const savedX = useSharedValue(0);
+    const savedY = useSharedValue(0);
+
+    const pinchGesture = Gesture.Pinch()
+        .onUpdate((e) => {
+            scale.value = Math.max(1, Math.min(5, savedScale.value * e.scale));
+        })
+        .onEnd(() => {
+            savedScale.value = scale.value;
+        });
+
+    const panGesture = Gesture.Pan()
+        .onUpdate((e) => {
+            const maxX = cardWidth * (scale.value - 1) / 2;
+            const maxY = bodyHeight * (scale.value - 1) / 2;
+            translateX.value = Math.max(-maxX, Math.min(maxX, savedX.value + e.translationX));
+            translateY.value = Math.max(-maxY, Math.min(maxY, savedY.value + e.translationY));
+        })
+        .onEnd(() => {
+            savedX.value = translateX.value;
+            savedY.value = translateY.value;
+        });
+
+    const doubleTapGesture = Gesture.Tap()
+        .numberOfTaps(2)
+        .onEnd(() => {
+            scale.value = withTiming(1);
+            savedScale.value = 1;
+            translateX.value = withTiming(0);
+            translateY.value = withTiming(0);
+            savedX.value = 0;
+            savedY.value = 0;
+        });
+
+    // Simultaneous so pinch and pan work at the same time;
+    // Race with doubleTap so a two-finger tap doesn't trigger double-tap reset.
+    const composedGesture = Gesture.Race(
+        Gesture.Simultaneous(pinchGesture, panGesture),
+        doubleTapGesture,
+    );
+
+    const nativeAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: translateX.value },
+            { translateY: translateY.value },
+            { scale: scale.value },
+        ],
+    }));
+
+    /** Closes the lightbox and resets all zoom/pan state */
+    const closeLightbox = () => {
+        setLightboxOpen(false);
+        // Web
+        setWebZoom(1);
+        setWebPanX(0);
+        setWebPanY(0);
+        // Native (run on JS thread — values reset before next open)
+        scale.value = 1;
+        savedScale.value = 1;
+        translateX.value = 0;
+        translateY.value = 0;
+        savedX.value = 0;
+        savedY.value = 0;
+    };
+
+    /** Card header — identical on web and native */
+    const renderCardHeader = () => (
+        <View style={[styles.cardHeader, themedStyles.cardHeader]}>
+            <Text style={[styles.cardTitle, themedStyles.cardTitle]}>
+                Course Map
+            </Text>
+            <View style={styles.cardControls}>
+                {Platform.OS === 'web' && (
+                    <>
+                        <Pressable
+                            style={[styles.zoomButton, themedStyles.zoomButton]}
+                            onPress={() => setWebZoom(z => Math.max(1, z - 0.5))}
+                            accessibilityLabel="Zoom out"
+                        >
+                            <Text style={[styles.zoomButtonText, themedStyles.zoomButtonText]}>−</Text>
+                        </Pressable>
+                        <Pressable
+                            style={[styles.zoomButton, themedStyles.zoomButton]}
+                            onPress={() => setWebZoom(z => Math.min(8, z + 0.5))}
+                            accessibilityLabel="Zoom in"
+                        >
+                            <Text style={[styles.zoomButtonText, themedStyles.zoomButtonText]}>+</Text>
+                        </Pressable>
+                    </>
+                )}
+                <Pressable
+                    style={[styles.closeButton, themedStyles.closeButton]}
+                    onPress={closeLightbox}
+                    accessibilityLabel="Close course map"
+                    accessibilityRole="button"
+                >
+                    <Text style={[styles.closeText, themedStyles.closeText]}>✕</Text>
+                </Pressable>
+            </View>
+        </View>
+    );
 
     useEffect(() => {
         const fetchCourseMap = async () => {
@@ -61,6 +195,15 @@ export function CourseMapViewer({ raceId }: CourseMapViewerProps): React.ReactEl
     if (!courseMap) return null;
 
     const thumbnailWidth = Math.round(THUMBNAIL_HEIGHT * (courseMap.aspectRatio || 4 / 3));
+
+    // Clamp web pan so the image edge can't be dragged past the container edge.
+    const clampWebPan = (px: number, py: number, zoom: number) => ({
+        x: Math.max(-(cardWidth * (zoom - 1) / 2), Math.min(cardWidth * (zoom - 1) / 2, px)),
+        y: Math.max(-(bodyHeight * (zoom - 1) / 2), Math.min(bodyHeight * (zoom - 1) / 2, py)),
+    });
+
+    const imageSize = { width: cardWidth, height: bodyHeight };
+    const cardSize = { width: cardWidth, height: cardHeight };
 
     return (
         <>
@@ -88,123 +231,109 @@ export function CourseMapViewer({ raceId }: CourseMapViewerProps): React.ReactEl
                 visible={lightboxOpen}
                 transparent
                 animationType="fade"
-                onRequestClose={() => setLightboxOpen(false)}
+                onRequestClose={closeLightbox}
                 statusBarTranslucent
             >
-                {/* Backdrop — tap outside card to dismiss */}
-                <Pressable
-                    style={styles.overlay}
-                    onPress={() => setLightboxOpen(false)}
-                >
-                    {/* Card — stop propagation so tapping inside doesn't close */}
-                    <Pressable
-                        style={[styles.card, themedStyles.card]}
-                        onPress={e => e.stopPropagation()}
-                    >
-                        {/* Card Header */}
-                        <View style={[styles.cardHeader, themedStyles.cardHeader]}>
-                            <Text style={[styles.cardTitle, themedStyles.cardTitle]}>
-                                Course Map
-                            </Text>
-                            <View style={styles.cardControls}>
-                                {/* Zoom controls — web only; native uses pinch */}
-                                {Platform.OS === 'web' && (
-                                    <>
-                                        <Pressable
-                                            style={[styles.zoomButton, themedStyles.zoomButton]}
-                                            onPress={() => setLightboxZoom(z => Math.max(0.5, z - 0.5))}
-                                            accessibilityLabel="Zoom out"
-                                        >
-                                            <Text style={[styles.zoomButtonText, themedStyles.zoomButtonText]}>−</Text>
-                                        </Pressable>
-                                        <Pressable
-                                            style={[styles.zoomButton, themedStyles.zoomButton]}
-                                            onPress={() => setLightboxZoom(z => Math.min(8, z + 0.5))}
-                                            accessibilityLabel="Zoom in"
-                                        >
-                                            <Text style={[styles.zoomButtonText, themedStyles.zoomButtonText]}>+</Text>
-                                        </Pressable>
-                                    </>
-                                )}
-                                <Pressable
-                                    style={[styles.closeButton, themedStyles.closeButton]}
-                                    onPress={() => setLightboxOpen(false)}
-                                    accessibilityLabel="Close course map"
-                                    accessibilityRole="button"
-                                >
-                                    <Text style={[styles.closeText, themedStyles.closeText]}>✕</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-
-                        {/* Image body */}
-                        {Platform.OS === 'web' ? (
-                            // Web: overflow-scroll container with pointer drag-to-pan
+                {Platform.OS === 'web' ? (
+                    // ── Web lightbox ──────────────────────────────────────────
+                    // Card is fixed size. Image uses CSS transform: translate + scale
+                    // so zoom buttons never shift the header position.
+                    <Pressable style={styles.overlay} onPress={closeLightbox}>
+                        <Pressable style={[styles.card, themedStyles.card, cardSize]} onPress={e => e.stopPropagation()}>
+                            {renderCardHeader()}
+                            {/* Fixed-size clip container — overflow hidden keeps zoomed image inside */}
                             <div
                                 style={{
-                                    overflow: 'auto',
-                                    flex: 1,
-                                    cursor: lightboxZoom > 1 ? 'grab' : 'default',
+                                    width: cardWidth,
+                                    height: bodyHeight,
+                                    overflow: 'hidden',
+                                    cursor: webZoom > 1
+                                        ? (isDraggingRef.current ? 'grabbing' : 'grab')
+                                        : 'default',
+                                    userSelect: 'none',
                                 }}
                                 onMouseDown={(e: any) => {
-                                    const div = e.currentTarget;
-                                    panRef.current = {
-                                        scrollLeft: div.scrollLeft,
-                                        scrollTop: div.scrollTop,
+                                    if (webZoom <= 1) return;
+                                    isDraggingRef.current = true;
+                                    webDragRef.current = {
                                         startX: e.clientX,
                                         startY: e.clientY,
+                                        panX: webPanX,
+                                        panY: webPanY,
                                     };
-                                    div.style.cursor = 'grabbing';
                                     e.preventDefault();
                                 }}
                                 onMouseMove={(e: any) => {
-                                    if (!panRef.current) return;
-                                    const div = e.currentTarget;
-                                    div.scrollLeft = panRef.current.scrollLeft - (e.clientX - panRef.current.startX);
-                                    div.scrollTop = panRef.current.scrollTop - (e.clientY - panRef.current.startY);
+                                    if (!webDragRef.current) return;
+                                    const dx = e.clientX - webDragRef.current.startX;
+                                    const dy = e.clientY - webDragRef.current.startY;
+                                    const clamped = clampWebPan(
+                                        webDragRef.current.panX + dx,
+                                        webDragRef.current.panY + dy,
+                                        webZoom,
+                                    );
+                                    setWebPanX(clamped.x);
+                                    setWebPanY(clamped.y);
                                 }}
-                                onMouseUp={(e: any) => {
-                                    panRef.current = null;
-                                    e.currentTarget.style.cursor = lightboxZoom > 1 ? 'grab' : 'default';
+                                onMouseUp={() => {
+                                    webDragRef.current = null;
+                                    isDraggingRef.current = false;
                                 }}
-                                onMouseLeave={(e: any) => {
-                                    panRef.current = null;
-                                    e.currentTarget.style.cursor = lightboxZoom > 1 ? 'grab' : 'default';
+                                onMouseLeave={() => {
+                                    webDragRef.current = null;
+                                    isDraggingRef.current = false;
                                 }}
                             >
                                 <img
                                     src={courseMap.fullUrl}
                                     alt="Course map"
                                     style={{
+                                        width: cardWidth,
+                                        height: bodyHeight,
+                                        objectFit: 'contain',
                                         display: 'block',
-                                        width: `${lightboxZoom * 100}%`,
-                                        height: 'auto',
-                                        userSelect: 'none',
+                                        // translate then scale: pan coords are in screen pixels
+                                        transform: `translate(${webPanX}px, ${webPanY}px) scale(${webZoom})`,
+                                        transformOrigin: 'center center',
                                         pointerEvents: 'none',
-                                    }}
+                                    } as any}
                                     draggable={false}
                                 />
                             </div>
-                        ) : (
-                            // Native: pinch-to-zoom + scroll-to-pan via ScrollView
-                            <ScrollView
-                                style={styles.scrollView}
-                                contentContainerStyle={styles.scrollContent}
-                                minimumZoomScale={1}
-                                maximumZoomScale={5}
-                                showsHorizontalScrollIndicator={false}
-                                showsVerticalScrollIndicator={false}
-                                centerContent
-                            >
-                                <Image
-                                    source={{ uri: courseMap.fullUrl }}
-                                    style={styles.fullImage}
-                                    resizeMode="contain"
-                                />
-                            </ScrollView>
-                        )}
+                        </Pressable>
                     </Pressable>
-                </Pressable>
+                ) : (
+                    // ── Native lightbox ───────────────────────────────────────
+                    // The outer View is full-screen with flex centering.
+                    // GestureHandlerRootView is wrapped in a fixed-size View so it
+                    // can't expand to fill the screen (its default is flex:1), which
+                    // would push the card to the top instead of centering it.
+                    <View style={styles.overlay}>
+                        <Pressable style={styles.overlayBackdrop} onPress={closeLightbox} />
+                        <View style={cardSize}>
+                            <GestureHandlerRootView>
+                                <View
+                                    style={[styles.card, themedStyles.card, cardSize]}
+                                    onStartShouldSetResponder={() => true}
+                                >
+                                    {renderCardHeader()}
+                                    {/* imageBody clips the zoomed/panned content */}
+                                    <View style={[styles.imageBody, imageSize]}>
+                                        <GestureDetector gesture={composedGesture}>
+                                            <AnimatedView style={[imageSize, nativeAnimatedStyle]}>
+                                                <Image
+                                                    source={{ uri: courseMap.fullUrl }}
+                                                    style={imageSize}
+                                                    resizeMode="contain"
+                                                />
+                                            </AnimatedView>
+                                        </GestureDetector>
+                                    </View>
+                                </View>
+                            </GestureHandlerRootView>
+                        </View>
+                    </View>
+                )}
             </Modal>
         </>
     );
