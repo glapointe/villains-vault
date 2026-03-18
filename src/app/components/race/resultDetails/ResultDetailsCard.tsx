@@ -147,13 +147,12 @@ export const ResultDetailsCard: React.FC<ResultDetailsCardProps> = ({ race, resu
         const currentDistance = split.isKilometers ? split.distance * 0.621371 : split.distance;
         const segmentDistance = currentDistance - previousDistance;
         const segmentSeconds = endSeconds - startSeconds;
-
         const paceSeconds = segmentSeconds / segmentDistance;
         const segmentPace = secondsToPace(paceSeconds);
 
-        const isFaster = segmentSeconds < previousPaceSeconds;
-        const isSlower = segmentSeconds > previousPaceSeconds;
-        previousPaceSeconds = segmentSeconds;
+		const isFaster = paceSeconds < previousPaceSeconds;
+        const isSlower = paceSeconds > previousPaceSeconds;
+        previousPaceSeconds = paceSeconds;
 
         return (
             <View key={`split-${index}`} style={[styles.splitRow, themedStyles.splitRow]}>
@@ -193,8 +192,8 @@ export const ResultDetailsCard: React.FC<ResultDetailsCardProps> = ({ race, resu
     }
 
 	const overallPlaceTotal = result.runnerType === RunnerType.Runner ? result.raceRunners : result.divisionRunners;
-    
-    return (
+
+	return (
         <View style={styles.container}>
             {/* Runner Info Header */}
             <Card>
