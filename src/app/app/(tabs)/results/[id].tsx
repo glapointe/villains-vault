@@ -311,114 +311,116 @@ export default function ResultDashboardScreen(): React.ReactElement {
 	
     return (
 		<>
-			<ScrollView style={[styles.container, themedStyles.container]} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="always">
-				<View style={[styles.content, themedStyles.content]}>
-					{/* Race Result Header with Event and Race Name */}
-					<SectionHeader
-						isPageHeader
-						leftContent={leftHeader}
-						rightContent={<View style={styles.headerActions}>
-							{/* Follow/Unfollow Button */}
-							<FollowButton raceResultId={raceResult.id} />
-						</View>}
-					/>
-
-					{/* AI Chat Prompt Bar */}
-					<View style={styles.promptContainer}>
-						<ChatPromptBar
-							mode="modal"
-							context={{ resultId: raceResult.id, raceId: race.id, runnerName: raceResult.name, pageName: 'results' }}
-							placeholder={`Ask about ${raceResult.name}'s results...`}
+			<View style={[styles.container, themedStyles.container]}>
+				<View style={styles.contentContainer}>
+					<View style={[styles.content, themedStyles.content]}>
+						{/* Race Result Header with Event and Race Name */}
+						<SectionHeader
+							isPageHeader
+							leftContent={leftHeader}
+							rightContent={<View style={styles.headerActions}>
+								{/* Follow/Unfollow Button */}
+								<FollowButton raceResultId={raceResult.id} />
+							</View>}
 						/>
-					</View>
 
-					{/* Result Details Card */}
-					<View style={styles.detailsContainer}>
-						<ResultDetailsCard
-							race={race}
-							result={raceResult}
-						/>
-					</View>
-
-					{/* Kill Chart - Lazy loaded */}
-					<View style={styles.chartContainer}>
-						<Suspense fallback={<LoadingSpinner />}>
-							<KillChart
-								race={race}
-								evaluatedRunner={raceResult}
+						{/* AI Chat Prompt Bar */}
+						<View style={styles.promptContainer}>
+							<ChatPromptBar
+								mode="modal"
+								context={{ resultId: raceResult.id, raceId: race.id, runnerName: raceResult.name, pageName: 'results' }}
+								placeholder={`Ask about ${raceResult.name}'s results...`}
 							/>
-						</Suspense>
-					</View>
+						</View>
 
-					{/* Closest Results Section */}
-					<View style={styles.closestResultsContainer}>
-						<Card>
-							<View style={styles.closestResultsHeader}>
-								<Text style={[styles.sectionTitle, themedStyles.sectionTitle]}>
-									Closest Starters & Finishers
-								</Text>
-								<View style={styles.fieldSizeControl}>
-									<Text style={[styles.fieldSizeLabel, themedStyles.fieldSizeLabel]}>Show:</Text>
-									<View style={styles.fieldSizeDropdown}>
-										<Dropdown
-											value={fieldSize}
-											options={[
-												{ label: '5', value: 5 },
-												{ label: '10', value: 10 },
-												{ label: '20', value: 20 },
-												{ label: '50', value: 50 },
-												{ label: '100', value: 100 },
-											]}
-											onChange={(value: number) => setFieldSize(value)}
-										/>
+						{/* Result Details Card */}
+						<View style={styles.detailsContainer}>
+							<ResultDetailsCard
+								race={race}
+								result={raceResult}
+							/>
+						</View>
+
+						{/* Kill Chart - Lazy loaded */}
+						<View style={styles.chartContainer}>
+							<Suspense fallback={<LoadingSpinner />}>
+								<KillChart
+									race={race}
+									evaluatedRunner={raceResult}
+								/>
+							</Suspense>
+						</View>
+
+						{/* Closest Results Section */}
+						<View style={styles.closestResultsContainer}>
+							<Card>
+								<View style={styles.closestResultsHeader}>
+									<Text style={[styles.sectionTitle, themedStyles.sectionTitle]}>
+										Closest Starters & Finishers
+									</Text>
+									<View style={styles.fieldSizeControl}>
+										<Text style={[styles.fieldSizeLabel, themedStyles.fieldSizeLabel]}>Show:</Text>
+										<View style={styles.fieldSizeDropdown}>
+											<Dropdown
+												value={fieldSize}
+												options={[
+													{ label: '5', value: 5 },
+													{ label: '10', value: 10 },
+													{ label: '20', value: 20 },
+													{ label: '50', value: 50 },
+													{ label: '100', value: 100 },
+												]}
+												onChange={(value: number) => setFieldSize(value)}
+											/>
+										</View>
 									</View>
 								</View>
-							</View>
 
-							{loadingClosest ? (
-								<View style={styles.loadingContainer}>
-									<LoadingSpinner size="large" />
-									<Text style={[styles.loadingText, themedStyles.loadingText]}>Loading closest results...</Text>
-								</View>
-							) : closestResults ? (
-								<View style={styles.gridsContainer}>
-									{/* Closest Starters Grid */}
-									<View style={styles.gridWrapper}>
-										<Text style={[styles.gridTitle, themedStyles.gridTitle]}>Closest Starters</Text>
-										<RaceResultsGrid
-											race={race}
-											compareResult={raceResult}
-											compareType="start"
-											results={closestResults.closestStarters}
-											initialPageSize={5}
-											pageSizeOptions={[5, 10, 20, 50]}
-											hideStatusBar={false}
-											defaultSortField={RaceResultColumn.TimeDifference}
-											onResultPress={(result) => router.push(`/results/${result.id}`)}
-										/>
+								{loadingClosest ? (
+									<View style={styles.loadingContainer}>
+										<LoadingSpinner size="large" />
+										<Text style={[styles.loadingText, themedStyles.loadingText]}>Loading closest results...</Text>
 									</View>
+								) : closestResults ? (
+									<View style={styles.gridsContainer}>
+										{/* Closest Starters Grid */}
+										<View style={styles.gridWrapper}>
+											<Text style={[styles.gridTitle, themedStyles.gridTitle]}>Closest Starters</Text>
+											<RaceResultsGrid
+												race={race}
+												compareResult={raceResult}
+												compareType="start"
+												results={closestResults.closestStarters}
+												initialPageSize={5}
+												pageSizeOptions={[5, 10, 20, 50]}
+												hideStatusBar={false}
+												defaultSortField={RaceResultColumn.TimeDifference}
+												onResultPress={(result) => router.push(`/results/${result.id}`)}
+											/>
+										</View>
 
-									{/* Closest Finishers Grid */}
-									<View style={styles.gridWrapper}>
-										<Text style={[styles.gridTitle, themedStyles.gridTitle]}>Closest Finishers</Text>
-										<RaceResultsGrid
-											race={race}
-											compareResult={raceResult}
-											compareType="finish"
-											results={closestResults.closestFinishers}
-											initialPageSize={5}
-											pageSizeOptions={[5, 10, 20, 50]}
-											hideStatusBar={false}
-											defaultSortField={RaceResultColumn.TimeDifference}
-											onResultPress={(result) => router.push(`/results/${result.id}`)}
-										/>
+										{/* Closest Finishers Grid */}
+										<View style={styles.gridWrapper}>
+											<Text style={[styles.gridTitle, themedStyles.gridTitle]}>Closest Finishers</Text>
+											<RaceResultsGrid
+												race={race}
+												compareResult={raceResult}
+												compareType="finish"
+												results={closestResults.closestFinishers}
+												initialPageSize={5}
+												pageSizeOptions={[5, 10, 20, 50]}
+												hideStatusBar={false}
+												defaultSortField={RaceResultColumn.TimeDifference}
+												onResultPress={(result) => router.push(`/results/${result.id}`)}
+											/>
+										</View>
 									</View>
-								</View>
-							) : null}
-						</Card>
+								) : null}
+							</Card>
+						</View>
 					</View>
 				</View>
-			</ScrollView>
+			</View>
 
 			{/* All Events Panel */}
 			<Panel

@@ -75,17 +75,19 @@ export default function UserManagementScreen(): React.ReactElement {
 	}
 
 	return (
-		<ScrollView style={[styles.container, themedStyles.container]} contentContainerStyle={styles.contentContainer} keyboardShouldPersistTaps="always">
-			<View style={[styles.content, themedStyles.content]}>
-				{accessToken && (
-					<Suspense fallback={<LoadingSpinner />}>
-						<UserManagementGrid
-							accessToken={accessToken}
-							currentUserId={currentUserId}
-						/>
-					</Suspense>
-				)}
+		<View style={[styles.container, themedStyles.container]}>
+			<View style={styles.contentContainer}>
+				<View style={[styles.content, themedStyles.content]}>
+					{accessToken && (
+						<Suspense fallback={<LoadingSpinner />}>
+							<UserManagementGrid
+								accessToken={accessToken}
+								currentUserId={currentUserId}
+							/>
+						</Suspense>
+					)}
+				</View>
 			</View>
-		</ScrollView>
+		</View>
 	);
 }
