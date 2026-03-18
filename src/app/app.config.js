@@ -98,9 +98,7 @@ module.exports = {
 		updates: {
 			url: `https://u.expo.dev/${expoProjectId}`,
 		},
-		runtimeVersion: {
-			policy: 'appVersion',
-		},
+		runtimeVersion: '1.0.0',
 		splash: {
 			image: './assets/villains-splash-icon.png',
 			resizeMode: 'contain',
