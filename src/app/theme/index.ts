@@ -84,10 +84,10 @@ export const palette = {
  */
 export const lightColors = {
 	// Surface colors
-	background: palette.gray[50],
-	surface: palette.gray[0],
-	surfaceElevated: palette.gray[0],
-	surfaceMuted: palette.gray[100],
+	background: palette.gray[0],
+	surface: palette.gray[50],
+	surfaceElevated: palette.gray[100],
+	surfaceMuted: palette.gray[200],
 	overlay: 'rgba(0, 0, 0, 0.4)',
     rowHighlightOverlay: 'rgba(0, 0, 0, 0.4)',
 	

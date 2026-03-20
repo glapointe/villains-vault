@@ -7,6 +7,7 @@
 import { StyleSheet } from 'react-native';
 import { spacing, typography, borderRadius } from '../../../theme';
 import type { ThemeColors } from '../../../theme';
+import { EdgeInsets } from 'react-native-safe-area-context';
 
 /** Height used for the inline thumbnail — width is computed from aspectRatio at runtime */
 export const THUMBNAIL_HEIGHT = 75;
@@ -19,9 +20,9 @@ export const HEADER_HEIGHT = 52;
  * Call this inside the component with values from useWindowDimensions() so
  * the dialog resizes correctly on device rotation.
  */
-export function getCardDimensions(winWidth: number, winHeight: number) {
-	const cardWidth = Math.min(winWidth * 0.92, 720);
-	const cardHeight = Math.min(winHeight * 0.85, 600);
+export function getCardDimensions(winWidth: number, winHeight: number, insets: EdgeInsets) {
+	const cardWidth = Math.min((winWidth - insets.left - insets.right) * 0.92, 720);
+	const cardHeight = Math.min((winHeight - insets.top - insets.bottom) * 0.85, 600);
 	const bodyHeight = cardHeight - HEADER_HEIGHT;
 	return { cardWidth, cardHeight, bodyHeight };
 }

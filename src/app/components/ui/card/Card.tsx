@@ -10,6 +10,7 @@ import { StyleProp, View, ViewProps, ViewStyle, Pressable, Modal, TouchableOpaci
 import { useTheme } from '../../../contexts/ThemeContext';
 import { getThemedColors } from '../../../theme';
 import { styles, getThemedStyles } from './Card.styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface CardProps extends ViewProps {
 	children: ReactNode | ((props: { isModal: boolean }) => ReactNode);
@@ -26,11 +27,12 @@ export function Card({ children, noPadding = false, allowPopout = false, style, 
 	const { isDark } = useTheme();
 	const colors = getThemedColors(isDark);
 	const themedStyles = getThemedStyles(colors);
+	const insets = useSafeAreaInsets();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { width } = useWindowDimensions();
 
 	// Responsive modal width: 800px for screens < 1300px, 1280px for larger screens
-	const modalMaxWidth = width < 1300 ? 800 : 1280;
+	const modalMaxWidth = (width < 1300 ? 800 : 1280) - insets.left - insets.right;
 
 	/**
 	 * Render content based on whether children is a function or regular ReactNode
@@ -102,11 +104,11 @@ export function Card({ children, noPadding = false, allowPopout = false, style, 
 							<TouchableOpacity
 								activeOpacity={1}
 								onPress={(e) => e.stopPropagation()}
-								style={[styles.modalContentWrapper, { maxWidth: modalMaxWidth }]}
+								style={[styles.modalContentWrapper, { maxWidth: modalMaxWidth, paddingLeft: insets.left, paddingRight: insets.right }]}
 							>							
 								{/* Close button */}
 								<TouchableOpacity
-									style={[styles.closeButton, themedStyles.closeButton]}
+									style={[styles.closeButton, themedStyles.closeButton, { marginRight: insets.right }]}
 									onPress={() => setIsModalOpen(false)}
 									accessibilityLabel="Close modal"
 								>

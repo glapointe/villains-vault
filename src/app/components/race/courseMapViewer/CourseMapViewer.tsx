@@ -28,6 +28,7 @@ import {
     THUMBNAIL_HEIGHT,
     getCardDimensions,
 } from './CourseMapViewer.styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export interface CourseMapViewerProps {
     /** Numeric race ID used to fetch the course map */
@@ -44,12 +45,13 @@ export function CourseMapViewer({ raceId }: CourseMapViewerProps): React.ReactEl
     const { isDark } = useTheme();
     const colors = getThemedColors(isDark);
     const themedStyles = useMemo(() => getThemedStyles(colors), [colors]);
+	const insets = useSafeAreaInsets();
 
     // Live dimensions — updates automatically on rotation.
     const { width: winWidth, height: winHeight } = useWindowDimensions();
     const { cardWidth, cardHeight, bodyHeight } = useMemo(
-        () => getCardDimensions(winWidth, winHeight),
-        [winWidth, winHeight],
+        () => getCardDimensions(winWidth, winHeight, insets),
+        [winWidth, winHeight, insets],
     );
 
     const [courseMap, setCourseMap] = useState<CourseMapImage | null>(null);

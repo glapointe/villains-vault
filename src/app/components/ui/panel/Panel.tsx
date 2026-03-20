@@ -231,7 +231,7 @@ export const Panel: React.FC<PanelProps> = ({
 			<AnimatedView style={[styles.panelContainer, { transform: [{ translateX: slideAnim }], width: panelWidth }]}>				
 				{/* {Platform.OS === 'web' ? panelBody : ( */}
 					<View style={{ flex: 1 }}>
-						<SafeAreaView edges={['top', 'bottom']} {...{ style: { flex: 1 } }}>
+						<SafeAreaView edges={['top', 'bottom', 'left', 'right']} {...{ style: { flex: 1 } }}>
 							{panelBody}
 						</SafeAreaView>
 					</View>

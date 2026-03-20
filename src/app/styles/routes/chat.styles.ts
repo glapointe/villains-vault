@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		maxWidth: 900,
 		width: '100%',
-		marginHorizontal: 'auto',
+		alignSelf: 'center',
 	},
 	chatWrapper: {
 		flex: 1,

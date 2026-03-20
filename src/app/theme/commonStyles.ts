@@ -31,13 +31,13 @@ export const layout = StyleSheet.create({
 	content: {
 		padding: spacing.sm,
 		maxWidth: 800,
-		marginHorizontal: 'auto',
+		alignSelf: 'center',
 		width: '100%',
 	},
     wideContent: {
 		padding: spacing.sm,
 		maxWidth: 1280,
-		marginHorizontal: 'auto',
+		alignSelf: 'center',
 		width: '100%',
 	},
 	// Centered card container (max-w-md)

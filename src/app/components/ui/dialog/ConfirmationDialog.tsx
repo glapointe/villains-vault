@@ -1,4 +1,7 @@
 import { Dialog } from "./Dialog";
+import { useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { spacing } from "theme";
 
 /**
  * Props for ConfirmationDialog component
@@ -25,7 +28,7 @@ export interface ConfirmationDialogProps {
 /**
  * Confirmation Dialog Component
  *
- * Displays a modal dialog with title, optional message, custom content, and a single action button.
+ * Displays a modal dialog with title, optional message, custom content, and action buttons.
  */
 export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     isOpen,
@@ -37,6 +40,11 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     onSubmit,
     onCancel,
 }): React.ReactElement | null => {
+	const { width } = useWindowDimensions();
+	const insets = useSafeAreaInsets();
+
+	const modalMaxWidth = Math.min(width, 500) - insets.left - insets.right - (spacing.md * 2);
+
     return (
         <Dialog
             isOpen={isOpen}
@@ -47,8 +55,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             hideCancelButton={false}
             cancelText={cancelText}
             submitText={submitText}
+			maxWidth={modalMaxWidth}
         >
-            {children}
+			{children}
         </Dialog>
     );
 };
