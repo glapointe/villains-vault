@@ -15,7 +15,7 @@ import { parseChartDirective } from './chartDirective';
 import { ChatChart } from '../../chat';
 import { MarkdownViewerProps } from './MarkdownViewer.types';
 import { FollowButton } from 'components/race';
-import { View } from 'react-native';
+import { Text } from 'react-native';
 
 /**
  * MarkdownViewer component for web platform
@@ -44,8 +44,9 @@ export function MarkdownViewer({ children }: MarkdownViewerProps): React.ReactEl
 					li: ({ node, ...props }) => <li style={styles.li as React.CSSProperties} {...props} />,
 					a: ({ node, href, ...props }) => {
 						const inAppPath = href ? getInAppPath(href) : null;
+						const resultId = inAppPath ? getResultIdFromUrl(inAppPath) : null;			
 						return (
-							<div style={styles.linkWrapper as React.CSSProperties}>
+							<span style={styles.linkWrapper as React.CSSProperties}>
 								<a
 									style={styles.a as React.CSSProperties}
 									{...props}
@@ -54,10 +55,13 @@ export function MarkdownViewer({ children }: MarkdownViewerProps): React.ReactEl
 									rel="noopener noreferrer"
 								/>
 								{/* If it's an in-app link to a race result, render a FollowButton */}
-								{inAppPath && getResultIdFromUrl(inAppPath) !== null && (
-									<FollowButton raceResultId={getResultIdFromUrl(inAppPath)!} mode="link" linkPrefixText="(" linkSuffixText=")" />
+								{inAppPath && resultId !== null && (
+									<>
+										{" "}
+										<FollowButton raceResultId={resultId} mode="link" linkPrefixText="(" linkSuffixText=")" />
+									</>
 								)}
-							</div>
+							</span>
 						);
 					},
 					strong: ({ node, ...props }) => <strong style={styles.strong as React.CSSProperties} {...props} />,

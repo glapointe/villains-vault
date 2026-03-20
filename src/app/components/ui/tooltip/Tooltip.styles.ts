@@ -9,7 +9,7 @@ import { StyleSheet, Platform } from 'react-native';
 import { borderRadius, spacing, shadows, typography } from '../../../theme';
 import type { ThemeColors } from '../../../theme';
 
-export const ARROW_SIZE = 8;
+export const ARROW_SIZE = 16;
 
 /**
  * Base tooltip structure (theme-independent)
@@ -118,7 +118,7 @@ export const styles = StyleSheet.create({
 	infoIcon: {
 		fontSize: typography.fontSize.base,
 		fontWeight: typography.fontWeight.bold,
-		paddingHorizontal: spacing.xs,
+		paddingLeft: spacing.xs,
 		marginBottom: Platform.OS !== 'web' ? -8 : 0,
 	},
 });
@@ -131,7 +131,7 @@ export const getThemedStyles = (colors: ThemeColors) => StyleSheet.create({
 	tooltipContainer: {
 		backgroundColor: colors.surfaceMuted,
 		borderColor: colors.border,
-		borderWidth: 1,
+		borderWidth: 0,
 	},
 	
 	contentText: {
@@ -139,20 +139,23 @@ export const getThemedStyles = (colors: ThemeColors) => StyleSheet.create({
 	},
 	
 	// Arrow colors for each placement direction
-	arrowTop: {
-		borderBottomColor: colors.surfaceMuted,
+	arrowBackground: {
+		backgroundColor: colors.surfaceMuted,
 	},
-	
-	arrowBottom: {
+	arrowTop: {
 		borderTopColor: colors.surfaceMuted,
 	},
 	
+	arrowBottom: {
+		borderBottomColor: colors.surfaceMuted,
+	},
+	
 	arrowLeft: {
-		borderRightColor: colors.surfaceMuted,
+		borderLeftColor: colors.surfaceMuted,
 	},
 	
 	arrowRight: {
-		borderLeftColor: colors.surfaceMuted,
+		borderRightColor: colors.surfaceMuted,
 	},
 	
 	infoIcon: {
