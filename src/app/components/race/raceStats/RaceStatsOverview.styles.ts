@@ -66,12 +66,12 @@ export const createStyles = (windowWidth: number = 400) => {
 			...Platform.select({
 				web: {
 					flex: 1,
-					minWidth: 130,
 				},
 				default: {
 					width: (isWide ? '22%' : '47%') as any,
 				},
 			}),
+			minWidth: 130,
 			paddingHorizontal: spacing.sm,
 			paddingVertical: spacing.md,
 			alignItems: 'center',

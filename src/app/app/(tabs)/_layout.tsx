@@ -41,31 +41,33 @@ function AppLayoutInner() {
 	});
 
 	return (
-		<ThemeBackground>
-			<View style={styles.container}>
-				<AppHeader />
-				{isFullHeight ? (
-					<View style={[styles.scrollView, { paddingBottom: insets.bottom }]}>
-						<View style={styles.content}>
-							<Slot />
+		<View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }}>
+			<ThemeBackground>
+				<View style={[styles.container]}>
+					<AppHeader />
+					{isFullHeight ? (
+						<View style={styles.scrollView}>
+							<View style={styles.content}>
+								<Slot />
+							</View>
 						</View>
-					</View>
-				) : (
-					<AnimScrollView
-						style={styles.scrollView}
-						contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom }]}
-						onScroll={scrollHandler}
-						scrollEventThrottle={16}
-						keyboardShouldPersistTaps="always"
-					>
-						<View style={styles.content}>
-							<Slot />
-						</View>
-						<Footer />
-					</AnimScrollView>
-				)}
-			</View>
-		</ThemeBackground>
+					) : (
+						<AnimScrollView
+							style={styles.scrollView}
+							contentContainerStyle={styles.scrollContent}
+							onScroll={scrollHandler}
+							scrollEventThrottle={16}
+							keyboardShouldPersistTaps="always"
+						>
+							<View style={styles.content}>
+								<Slot />
+							</View>
+							<Footer />
+						</AnimScrollView>
+					)}
+				</View>
+			</ThemeBackground>
+		</View>
 	);
 }
 

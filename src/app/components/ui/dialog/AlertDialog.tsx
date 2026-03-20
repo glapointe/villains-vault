@@ -1,4 +1,7 @@
 import { Dialog } from "./Dialog";
+import { useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { spacing } from "theme";
 
 /**
  * Props for AlertDialog component
@@ -31,7 +34,12 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
     submitText = 'OK',
     onSubmit,
 }): React.ReactElement | null => {
-    return (
+	const { width } = useWindowDimensions();
+	const insets = useSafeAreaInsets();
+
+	const modalMaxWidth = Math.min(width, 500) - insets.left - insets.right - (spacing.md * 2);
+	
+	return (
         <Dialog
             isOpen={isOpen}
             title={title}
@@ -40,6 +48,7 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
             onCancel={() => {}}
             hideCancelButton={true}
             submitText={submitText}
+			maxWidth={modalMaxWidth}
         >
             {children}
         </Dialog>

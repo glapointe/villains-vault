@@ -98,7 +98,6 @@ export const styles = StyleSheet.create({
 		maxWidth: 500,
 	},
 	suggestionChip: {
-		width: 'fit-content',
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.sm,
 		borderRadius: borderRadius.lg,

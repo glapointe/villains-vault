@@ -10,6 +10,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { getThemedColors } from '../../../theme';
 import { Button } from '../button';
 import { styles, getThemedStyles } from './Dialog.styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * Props for Dialog component
@@ -35,6 +36,8 @@ export interface DialogProps {
 	submitDisabled?: boolean;
     /** Whether to hide the cancel button */
     hideCancelButton?: boolean;
+	/** Maximum width of the dialog */
+	maxWidth?: number | string;
 }
 
 /**
@@ -53,10 +56,12 @@ export const Dialog: React.FC<DialogProps> = ({
 	onCancel,
 	submitDisabled = false,
     hideCancelButton = false,
+	maxWidth,
 }): React.ReactElement | null => {
 	const { isDark } = useTheme();
 	const colors = getThemedColors(isDark);
 	const themedStyles = getThemedStyles(colors);
+	const insets = useSafeAreaInsets();
 
 	if (!isOpen) return null;
 
@@ -77,7 +82,7 @@ export const Dialog: React.FC<DialogProps> = ({
 						activeOpacity={1}
 						onPress={(e) => e.stopPropagation()}
 					>
-						<View style={[styles.modalView, themedStyles.modalView]}>
+						<View style={[styles.modalView, themedStyles.modalView, { maxWidth, marginLeft: insets.left, marginRight: insets.right } ]}>
 							{/* Header */}
 							<Text style={[styles.title, themedStyles.title]}>
 								{title}

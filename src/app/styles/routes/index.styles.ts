@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
 		paddingTop: spacing.xl,
 		paddingHorizontal: spacing.lg,
 		maxWidth: 900,
-		marginHorizontal: 'auto',
+		alignSelf: 'center',
 		width: '100%',
 		position: 'relative',
 		zIndex: 1,

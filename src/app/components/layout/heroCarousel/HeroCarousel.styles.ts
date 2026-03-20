@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
 		paddingBottom: spacing['2xl'],
 		paddingTop: spacing['2xl'],
 		maxWidth: 800,
-		marginHorizontal: 'auto',
+		alignSelf: 'center',
 		width: '100%',
 	},
 	title: {
