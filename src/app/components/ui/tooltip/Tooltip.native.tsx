@@ -300,9 +300,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
 		if (!showArrow || !position) return null;
 
 		const p = position.placement;
-		const arrowColor = colors.surfaceElevated;
-		const size = ARROW_SIZE * 1.5; // visual arrow size (rotated square)
-		const overlap = 2; // pixels of overlap with container to prevent gap
+		const size = ARROW_SIZE * 1.85; // visual arrow size (rotated square)
+		const overlap = 0; // pixels of overlap with container to prevent gap
 
 		let arrowTop = 0;
 		let arrowLeft = 0;
@@ -333,7 +332,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 					left: arrowLeft,
 					width: size,
 					height: size,
-					backgroundColor: arrowColor,
+					...themedStyles.arrowBackground,
 					transform: [{ rotate: '45deg' }],
 					zIndex: 10,
 					elevation: 0,
@@ -344,11 +343,12 @@ export const Tooltip: React.FC<TooltipProps> = ({
 	};
 
 	return (
-		<View>
-			<Pressable ref={triggerRef} onPress={toggle} style={styles.triggerPressable}>
-				{children}
-			</Pressable>
-
+		<>
+			<Text>
+				<Pressable ref={triggerRef} onPress={toggle} style={styles.triggerPressable}>
+					{children}
+				</Pressable>
+			</Text>
 			<Modal
 				visible={visible}
 				transparent
@@ -414,7 +414,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 					</View>
 				</Pressable>
 			</Modal>
-		</View>
+		</>
 	);
 };
 

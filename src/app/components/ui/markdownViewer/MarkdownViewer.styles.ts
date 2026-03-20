@@ -63,9 +63,6 @@ export const getWebMarkdownStyles = (colors: ThemeColors) => ({
 		textDecoration: 'none',
 	},
 	linkWrapper: {
-		display: 'inline-flex',
-		alignItems: 'baseline',
-		gap: spacing.xs,
 	},
 	strong: {
 		fontWeight: typography.fontWeight.bold,

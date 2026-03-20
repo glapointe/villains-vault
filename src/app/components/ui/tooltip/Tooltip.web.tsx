@@ -260,7 +260,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 		if (!showArrow || !position) return null;
 
 		const p = position.placement;
-		const arrowColor = colors.surfaceElevated;
+		const arrowColor = colors.surfaceMuted;
 
 		const arrowBaseStyle: React.CSSProperties = {
 			position: 'absolute',
@@ -274,21 +274,21 @@ export const Tooltip: React.FC<TooltipProps> = ({
 		if (p === 'top') {
 			// Arrow at bottom of tooltip, pointing down toward trigger
 			arrowSpecificStyle = {
-				bottom: -ARROW_SIZE,
+				bottom: -ARROW_SIZE + 2,
 				left: (position.arrowLeft ?? width / 2) - ARROW_SIZE,
 				borderTopWidth: ARROW_SIZE,
 				borderRightWidth: ARROW_SIZE,
 				borderBottomWidth: 0,
 				borderLeftWidth: ARROW_SIZE,
-				borderTopColor: arrowColor,
 				borderRightColor: 'transparent',
 				borderBottomColor: 'transparent',
 				borderLeftColor: 'transparent',
+				...themedStyles.arrowTop
 			};
 		} else if (p === 'bottom') {
 			// Arrow at top of tooltip, pointing up toward trigger
 			arrowSpecificStyle = {
-				top: -ARROW_SIZE,
+				top: -ARROW_SIZE + 2,
 				left: (position.arrowLeft ?? width / 2) - ARROW_SIZE,
 				borderTopWidth: 0,
 				borderRightWidth: ARROW_SIZE,
@@ -296,13 +296,13 @@ export const Tooltip: React.FC<TooltipProps> = ({
 				borderLeftWidth: ARROW_SIZE,
 				borderTopColor: 'transparent',
 				borderRightColor: 'transparent',
-				borderBottomColor: arrowColor,
 				borderLeftColor: 'transparent',
+				...themedStyles.arrowBottom
 			};
 		} else if (p === 'left') {
 			// Arrow at right of tooltip, pointing right toward trigger
 			arrowSpecificStyle = {
-				right: -ARROW_SIZE,
+				right: -ARROW_SIZE + 2,
 				top: (position.arrowTop ?? 0) - ARROW_SIZE,
 				borderTopWidth: ARROW_SIZE,
 				borderRightWidth: 0,
@@ -311,21 +311,21 @@ export const Tooltip: React.FC<TooltipProps> = ({
 				borderTopColor: 'transparent',
 				borderRightColor: 'transparent',
 				borderBottomColor: 'transparent',
-				borderLeftColor: arrowColor,
+				...themedStyles.arrowLeft,
 			};
 		} else if (p === 'right') {
 			// Arrow at left of tooltip, pointing left toward trigger
 			arrowSpecificStyle = {
-				left: -ARROW_SIZE,
+				left: -ARROW_SIZE + 2,
 				top: (position.arrowTop ?? 0) - ARROW_SIZE,
 				borderTopWidth: ARROW_SIZE,
 				borderRightWidth: ARROW_SIZE,
 				borderBottomWidth: ARROW_SIZE,
 				borderLeftWidth: 0,
 				borderTopColor: 'transparent',
-				borderRightColor: arrowColor,
 				borderBottomColor: 'transparent',
 				borderLeftColor: 'transparent',
+				...themedStyles.arrowRight,
 			};
 		}
 
@@ -386,16 +386,15 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
 	return (
 		<>
-			<div
+			<span
 				ref={triggerRef}
 				onMouseEnter={hoverEnabled ? handleMouseEnter : undefined}
 				onMouseLeave={hoverEnabled ? handleMouseLeave : undefined}
-				style={{ display: 'inline-flex', width: 'fit-content' }}
 			>
-				<Pressable onPress={toggle} style={styles.triggerPressable}>
+				<Text onPress={toggle} style={styles.triggerPressable}>
 					{children}
-				</Pressable>
-			</div>
+				</Text>
+			</span>
 			{renderTooltip()}
 		</>
 	);

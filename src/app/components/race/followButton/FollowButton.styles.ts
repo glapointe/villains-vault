@@ -27,20 +27,25 @@ export const styles = StyleSheet.create({
 		borderRadius: borderRadius.md,
 		borderWidth: 1,
 		...Platform.select({
-			web: { cursor: 'pointer' } as any,
+			web: {
+				display: 'flex',
+				cursor: 'pointer',
+			} as any,
 			default: {},
 		}),
 	},
 	followLink: {
-		paddingHorizontal: spacing.sm,
 		...Platform.select({
-			web: { cursor: 'pointer' } as any,
+			web: { 
+				cursor: 'pointer',
+				display: 'inline',
+			} as any,
 			default: {},
 		}),
 	},
 	followButtonText: {
-			fontSize: typography.fontSize.sm,
-			fontWeight: typography.fontWeight.semibold,
+		fontSize: typography.fontSize.sm,
+		fontWeight: typography.fontWeight.semibold,
 	},
 	followLinkText: {
 		fontSize: typography.fontSize.sm,

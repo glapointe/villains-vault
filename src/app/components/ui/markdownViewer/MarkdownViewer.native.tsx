@@ -5,7 +5,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { Linking, View } from 'react-native';
+import { Linking, View, Text } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -56,13 +56,17 @@ export function MarkdownViewer({ children }: MarkdownViewerProps): React.ReactEl
 		link: (node: any, children: any, parent: any, markdownStylesArg: any) => {
 			const href = node.attributes?.href || '';
 			const inAppPath = getInAppPath(href);
+			const resultId = inAppPath ? getResultIdFromUrl(inAppPath) : null;
 			return (
-				<View key={node.key} style={markdownStyles.linkWrapper}>
+				<React.Fragment key={node.key}>
 					{children}
-					{inAppPath && getResultIdFromUrl(inAppPath) !== null && (
-						<FollowButton raceResultId={getResultIdFromUrl(inAppPath)!} mode="link" linkPrefixText="(" linkSuffixText=")" />
+					{resultId !== null && (
+						<>
+							<Text> </Text>
+							<FollowButton raceResultId={resultId} mode="link" linkPrefixText="(" linkSuffixText=")" />
+						</>
 					)}
-				</View>
+				</React.Fragment>
 			);
 		},
 		table: (node: any, children: any, parent: any, markdownStylesArg: any) => (
