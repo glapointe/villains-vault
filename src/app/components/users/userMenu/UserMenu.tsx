@@ -180,10 +180,10 @@ export function UserMenu({ isMobile, headerRef, onOpenMenu }: UserMenuProps) {
 				: {};
 
 		const nativePos = isMobile
-			? { top: 68 + insets.top, left: 0 as any, right: 0 as any }
+			? { top: 68 + insets.top, right: 0 as any }
 			: { top: 68 + insets.top };
 		const webPos = isMobile
-			? { position: 'fixed' as any, top: dropdownPos.top, left: 0, right: 0 }
+			? { position: 'fixed' as any, top: dropdownPos.top, right: 0 }
 			: { position: 'fixed' as any, top: dropdownPos.top, right: dropdownPos.right };
 		const posStyle = Platform.OS === 'web' ? webPos : nativePos;
 

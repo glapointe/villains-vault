@@ -5,7 +5,7 @@
  */
 
 import { StyleSheet } from 'react-native';
-import { spacing, typography } from '../../../theme';
+import { spacing, typography, shadows, borderRadius } from '../../../theme';
 import type { ThemeColors } from '../../../theme';
 
 export const styles = StyleSheet.create({
@@ -21,16 +21,32 @@ export const styles = StyleSheet.create({
 
 	// ── Mobile dropdown ────────────────────────────────────────────────────────
 	mobileMenu: {
-		borderTopWidth: 1,
+		position: 'absolute',
+		maxWidth: 320,
+		width: '100%',
+		right: 0,
+		borderWidth: 1,
+		borderRadius: borderRadius.md,
+		zIndex: 9999,
 		paddingVertical: spacing.sm,
+		...shadows.xl,
 	},
 	mobileMenuItem: {
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.md,
-		borderBottomWidth: 1,
 	},
 	mobileMenuText: {
 		fontSize: typography.fontSize.base,
+	},
+
+	// ── Backdrop ──────────────────────────────────────────────────────────────
+	dropdownBackdrop: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		zIndex: 99,
 	},
 });
 
@@ -40,8 +56,8 @@ export const getThemedStyles = (colors: ThemeColors) =>
 			color: colors.textPrimary,
 		},
 		mobileMenu: {
-			backgroundColor: colors.surfaceElevated,
-			borderTopColor: colors.border,
+			backgroundColor: colors.background,
+			borderColor: colors.border,
 		},
 		mobileMenuItem: {
 			borderBottomColor: colors.borderLight,

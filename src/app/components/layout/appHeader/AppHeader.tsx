@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text, useWindowDimensions, Platform } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -37,9 +37,9 @@ export function AppHeader() {
     useEffect(() => {
         if (!isMobile && menuOpen) setMenuOpen(false);
     }, [isMobile]);
-
+	
     return (
-        <View ref={headerRef as any} style={[styles.header, themedStyles.header, { paddingTop: insets.top }]}>
+        <View ref={headerRef as any} style={[styles.header, themedStyles.header]}>
             <View style={styles.container}>
                 {/* Logo/Brand */}
                 <View style={styles.brandRow}>
@@ -62,7 +62,7 @@ export function AppHeader() {
                             />
                         </Pressable>
 
-                        <HeaderMenu isMobile={false} />
+                        <HeaderMenu headerRef={headerRef} isMobile={false} />
                         <UserMenu isMobile={false} headerRef={headerRef} />
                     </View>
                 )}
@@ -90,7 +90,7 @@ export function AppHeader() {
             </View>
 
             {/* Mobile nav menu — rendered here (outside the flex row) so it expands full-width */}
-            <HeaderMenu isMobile={true} menuOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+            <HeaderMenu headerRef={headerRef} isMobile={true} menuOpen={menuOpen} onClose={() => setMenuOpen(false)} />
         </View>
     );
 }

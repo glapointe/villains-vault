@@ -107,15 +107,17 @@ export const styles = StyleSheet.create({
 	// ── Mobile full-width sheet ────────────────────────────────────────────────
 	userDropdownMobile: {
 		position: 'absolute',
-		left: 0,
+		maxWidth: 320,
+		width: '100%',
 		right: 0,
-		borderTopWidth: 1,
+		borderWidth: 1,
+		borderRadius: borderRadius.md,
 		zIndex: 9999,
+		...shadows.xl,
 	},
 	mobileMenuItem: {
 		paddingHorizontal: spacing.md,
 		paddingVertical: spacing.md,
-		borderBottomWidth: 1,
 	},
 	mobileMenuText: {
 		fontSize: typography.fontSize.base,
@@ -150,7 +152,7 @@ export const getThemedStyles = (colors: ThemeColors) =>
 			borderBottomColor: colors.borderLight,
 		},
 		dropdownUserHeaderMobile: {
-			backgroundColor: colors.surfaceElevated,
+			backgroundColor: colors.background,
 		},
 		dropdownUserAvatar: {
 			backgroundColor: colors.primary,
@@ -165,7 +167,7 @@ export const getThemedStyles = (colors: ThemeColors) =>
 			color: colors.textSecondary,
 		},
 		userDropdown: {
-			backgroundColor: colors.surface,
+			backgroundColor: colors.background,
 			borderColor: colors.border,
 		},
 		userDropdownItem: {
@@ -178,8 +180,8 @@ export const getThemedStyles = (colors: ThemeColors) =>
 			color: colors.textPrimary,
 		},
 		userDropdownMobile: {
-			backgroundColor: colors.surfaceElevated,
-			borderTopColor: colors.border,
+			backgroundColor: colors.background,
+			borderColor: colors.border,
 		},
 		mobileMenuItem: {
 			borderBottomColor: colors.borderLight,
