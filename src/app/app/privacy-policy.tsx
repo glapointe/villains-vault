@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { getThemedColors } from '../theme';
 import { Button, MarkdownViewer } from '../components/ui';
 import { styles, getThemedStyles } from '../styles/routes/privacy-policy.styles';
+import { apiClient } from 'services/api/client';
 
 /**
  * Privacy Policy Page
@@ -24,10 +25,8 @@ export default function PrivacyPolicyScreen() {
 		const loadMarkdown = async () => {
 			try {
 				// Load markdown file as a text asset
-				const privacyPolicyUrl = require('../assets/content/privacy-policy.md');
-				const response = await fetch(privacyPolicyUrl);
-				const text = await response.text();
-				setContent(text);
+				const response = await apiClient.get<string>('/assets/content/privacy-policy.md');
+				setContent(response.data);
 			} catch (error) {
 				console.error('Failed to load privacy policy:', error);
 				setContent('# Privacy Policy\n\nFailed to load content. Please try again later.');

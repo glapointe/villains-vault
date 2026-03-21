@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { getThemedColors } from '../theme';
 import { Button, MarkdownViewer } from '../components/ui';
 import { styles, getThemedStyles } from '../styles/routes/terms-of-service.styles';
+import { apiClient } from 'services/api';
 
 /**
  * Terms of Service Page
@@ -24,10 +25,8 @@ export default function TermsOfServiceScreen() {
 		const loadMarkdown = async () => {
 			try {
 				// Load markdown file as a text asset
-				const termsUrl = require('../assets/content/terms-of-service.md');
-				const response = await fetch(termsUrl);
-				const text = await response.text();
-				setContent(text);
+				const response = await apiClient.get<string>('/assets/content/terms-of-service.md');
+				setContent(response.data);
 			} catch (error) {
 				console.error('Failed to load terms of service:', error);
 				setContent('# Terms of Service\n\nFailed to load content. Please try again later.');
