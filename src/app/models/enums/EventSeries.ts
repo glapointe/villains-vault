@@ -13,7 +13,6 @@ export enum EventSeries {
     DisneylandHalfMarathon = 2,
 
     /** The Disney World Wine & Dine Weekend event series typically occurs in early November or late October. */
-    /// </summary>
     DisneyWorldWineAndDine = 3,
 
     /** The Disney World Marathon Weekend event series typically occurs in early January. */
