@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 using Azure.AI.Projects;
-using Azure.AI.Projects.OpenAI;
+using Azure.AI.Extensions.OpenAI;
 using Azure.Identity;
 using Falchion.Villains.Vault.Api.DTOs;
 using Microsoft.Extensions.Caching.Memory;
@@ -61,7 +61,7 @@ public sealed class AiChatService
 			return conversationId;
 		}
 
-		var conversation = await _projectClient.OpenAI.Conversations
+		var conversation = await _projectClient.ProjectOpenAIClient.GetProjectConversationsClient()
 			.CreateProjectConversationAsync(new ProjectConversationCreationOptions());
 		conversationId = conversation.Value.Id;
 
@@ -119,7 +119,7 @@ public sealed class AiChatService
 		{
 			pendingApprovals.Clear();
 
-			var responsesClient = _projectClient.OpenAI
+			var responsesClient = _projectClient.ProjectOpenAIClient
 				.GetProjectResponsesClientForAgent(
 					new AgentReference(_options.AgentId, _options.AgentVersion),
 					conversationId);
