@@ -7,9 +7,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { View, Text, ActivityIndicator, Linking, Pressable as RNPressable } from 'react-native';
-import { Pressable } from 'react-native-gesture-handler';
+import { View, Text, ActivityIndicator, Linking, Pressable } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { getThemedColors } from '../../../theme';
@@ -76,6 +74,7 @@ export function CommunityEventPreview({
 	const [participantsPanelEvent, setParticipantsPanelEvent] = useState<CommunityEvent | null>(null);
 
 	const handleParticipate = useCallback((event: CommunityEvent) => {
+		console.log('Participate in event', event.id);
 		setParticipationPanelEvent(event);
 		setParticipationPanelOpen(true);
 	}, []);
@@ -113,26 +112,17 @@ export function CommunityEventPreview({
 				return (
 					<View key={event.id} style={[styles.eventCard, themedStyles.eventCard]}>
 						{event.link ? (
-							<RNPressable
-								style={styles.titleLink}
-								onPress={() => Linking.openURL(event.link!)}
-							>
-								{({ hovered }: { hovered: boolean }): ReactNode => (
-									<>
-										<Text
-											style={[
-												styles.eventTitle,
-												themedStyles.eventTitleLink,
-												hovered && themedStyles.eventTitleLinkHovered,
-											]}
-											numberOfLines={1}
-										>
-											{event.title}
-										</Text>
-										<Feather name="external-link" size={14} color={colors.primary} />
-									</>
-								)}
-							</RNPressable>
+						<Pressable
+							style={styles.titleLink}
+							onPress={() => Linking.openURL(event.link!)}
+						>
+							{({ hovered }: { hovered: boolean }) => (
+								<>
+									<Text style={[styles.eventTitle, hovered ? themedStyles.eventTitleLinkHovered : themedStyles.eventTitleLink]} numberOfLines={1}>{event.title}</Text>
+									<Feather name="external-link" size={14} color={colors.primary} />
+								</>
+							)}
+						</Pressable>
 						) : (
 							<Text style={[styles.eventTitle, themedStyles.eventTitle]} numberOfLines={1}>
 								{event.title}
@@ -175,11 +165,13 @@ export function CommunityEventPreview({
 							)}
 
 							{event.participantCount > 0 && (
-								<Pressable onPress={() => handleViewParticipants(event)}>
-									<Text style={[styles.participantCount, themedStyles.participantCountLink]}>
+							<Pressable onPress={() => handleViewParticipants(event)}>
+								{({ hovered }: { hovered: boolean }) => (
+									<Text style={[styles.participantCount, hovered ? themedStyles.participantCountLinkHovered : themedStyles.participantCountLink]}>
 										{event.participantCount} participant{event.participantCount !== 1 ? 's' : ''}
 									</Text>
-								</Pressable>
+								)}
+							</Pressable>
 							)}
 						</View>
 					</View>
@@ -188,7 +180,9 @@ export function CommunityEventPreview({
 
 			{!loading && events.length > 0 && (
 				<Pressable style={styles.viewAllRow} onPress={onViewAll}>
-					<Text style={[styles.viewAllText, themedStyles.viewAllText]}>View All Community Events →</Text>
+					{({ hovered }: { hovered: boolean }) => (
+						<Text style={[styles.viewAllText, hovered ? themedStyles.viewAllTextHovered : themedStyles.viewAllText]}>View All Community Events →</Text>
+					)}
 				</Pressable>
 			)}
 

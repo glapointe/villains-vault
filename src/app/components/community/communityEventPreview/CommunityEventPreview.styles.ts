@@ -109,8 +109,16 @@ export const getThemedStyles = (colors: ThemeColors) => StyleSheet.create({
 	participantCountLink: {
 		color: colors.primary,
 	},
+	participantCountLinkHovered: {
+		color: colors.primary,
+		textDecorationLine: 'underline' as const,
+	},
 	viewAllText: {
 		color: colors.primary,
+	},
+	viewAllTextHovered: {
+		color: colors.primary,
+		textDecorationLine: 'underline' as const,
 	},
 	emptyText: {
 		color: colors.textTertiary,

@@ -5,7 +5,7 @@
  * overlay backdrop, and close button. Typically slides in from the right side.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal, Animated, Dimensions, BackHandler, Platform, ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -84,6 +84,18 @@ export const Panel: React.FC<PanelProps> = ({
 	// manually so the footer/content is never obscured by the system navigation bar.
 	const webBottomInset = Platform.OS === 'web' ? insets.bottom : 0;
 
+	// Guard against ghost taps on mobile web: the backdrop is disabled for a short
+	// window after the panel opens so that the same touch event that triggered the
+	// open cannot immediately land on the backdrop and close the panel again.
+	const backdropReadyRef = useRef(false);
+	useEffect(() => {
+		if (isOpen) {
+			backdropReadyRef.current = false;
+			const timer = setTimeout(() => { backdropReadyRef.current = true; }, 350);
+			return () => clearTimeout(timer);
+		}
+	}, [isOpen]);
+
 	/**
 	 * Calculate responsive panel width based on variant and screen size
 	 * On mobile devices (<600px), uses full screen width
@@ -159,6 +171,7 @@ export const Panel: React.FC<PanelProps> = ({
 	 * Handle backdrop tap to close panel if lightDismiss is enabled
 	 */
 	const handleBackdropPress = (): void => {
+		if (!backdropReadyRef.current) return;
 		if (lightDismiss) {
 			onClose();
 		}
