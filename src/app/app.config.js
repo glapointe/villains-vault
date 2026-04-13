@@ -104,6 +104,10 @@ module.exports = {
 		orientation: 'default',
 		icon: './assets/villains-icon.png',
 		userInterfaceStyle: 'automatic',
+		androidStatusBar: {
+			barStyle: 'light-content',
+			translucent: true,
+		},
 		scheme: 'villains-vault',
 		newArchEnabled: true,
 		updates: {
@@ -151,6 +155,12 @@ module.exports = {
 		plugins: [
 			'expo-router',
 			[
+				'expo-system-ui',
+				{
+					backgroundColor: '#000000',
+				},
+			],
+			[
 				'expo-notifications',
 				{
 					icon: './assets/villains-notification-icon.png',
@@ -168,6 +178,7 @@ module.exports = {
 				'./plugins/withGradleWrapper',
 				{ gradleVersion: '8.13' },
 			],
+			'./plugins/withAndroidEdgeToEdge',
 		],
 		experiments: {
 			typedRoutes: true,
