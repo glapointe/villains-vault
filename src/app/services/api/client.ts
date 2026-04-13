@@ -47,3 +47,36 @@ export function setAuthToken(token: string | null) {
 		delete apiClient.defaults.headers.common['Authorization'];
 	}
 }
+
+/**
+ * Module-level callback invoked when a 401 Unauthorized response is received
+ * for an authenticated request (i.e. the access token has expired mid-session).
+ */
+let onTokenExpired: (() => void) | null = null;
+
+/**
+ * Register a handler to be called when an authenticated API request returns 401.
+ * Pass null to unregister.
+ * @param handler - Callback to invoke on token expiry, or null to clear
+ */
+export function setTokenExpiredHandler(handler: (() => void) | null): void {
+	onTokenExpired = handler;
+}
+
+/**
+ * Response interceptor — triggers the token-expired handler when a request
+ * that carried an Authorization header receives a 401 response.
+ */
+apiClient.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		if (
+			error.response?.status === 401 &&
+			error.config?.headers?.Authorization &&
+			onTokenExpired
+		) {
+			onTokenExpired();
+		}
+		return Promise.reject(error);
+	}
+);

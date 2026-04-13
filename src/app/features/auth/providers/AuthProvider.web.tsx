@@ -10,7 +10,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Auth0Provider as Auth0ProviderWeb, useAuth0 } from '@auth0/auth0-react';
 import { auth0Config } from './config';
-import { api, setAuthToken } from '../../../services/api';
+import { api, setAuthToken, setTokenExpiredHandler } from '../../../services/api';
 import { useAnalytics } from '../../analytics/hooks/useAnalytics';
 import type { User } from '../../../models';
 
@@ -123,6 +123,48 @@ export function useAuth() {
 	 * Fetch access token and user profile when authenticated
 	 */
 	useEffect(() => {
+		if (!isAuthenticated || !auth0User) {
+			setTokenExpiredHandler(null);
+			if (!isAuthenticated) {
+				clearUserProfileCache();
+				setUser(null);
+				setAccessToken(null);
+				setAuthToken(null);
+			}
+			return;
+		}
+
+		// Register a 401 handler: attempt a silent token refresh via the Auth0 SDK
+		// before falling back to a full sign-out. getAccessTokenSilently() will
+		// transparently use refresh-token rotation or a hidden iframe.
+		setTokenExpiredHandler(async () => {
+			console.log('[Auth] Received 401 from API, attempting silent token refresh...');
+			try {
+				const freshToken = await getAccessTokenSilently();
+				setAccessToken(freshToken);
+				setAuthToken(freshToken);
+				console.log('[Auth] Silent token refresh succeeded after 401');
+			} catch (err) {
+				console.warn('[Auth] Silent token refresh failed after 401, signing out:', err);
+				setAuthToken(null);
+				clearUserProfileCache();
+				setUser(null);
+				setAccessToken(null);
+				await auth0Logout({
+					logoutParams: {
+						returnTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+					},
+				});
+			}
+		});
+
+		return () => setTokenExpiredHandler(null);
+	}, [isAuthenticated, auth0User, getAccessTokenSilently, auth0Logout]);
+
+	/**
+	 * Fetch access token and user profile when authenticated
+	 */
+	useEffect(() => {
 		if (isAuthenticated && auth0User) {
 			const fetchUserProfile = async () => {
 				try {
@@ -190,12 +232,6 @@ export function useAuth() {
 			};
 
 			fetchUserProfile();
-		} else if (!isAuthenticated) {
-			// Clear cache and user data when not authenticated
-			clearUserProfileCache();
-			setUser(null);
-			setAccessToken(null);
-			setAuthToken(null);
 		}
 	}, [isAuthenticated, auth0User, getAccessTokenSilently]);
 

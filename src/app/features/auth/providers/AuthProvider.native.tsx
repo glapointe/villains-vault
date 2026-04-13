@@ -11,7 +11,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import Auth0 from 'react-native-auth0';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth0Config } from './config';
-import { api, setAuthToken } from '../../../services/api';
+import { api, setAuthToken, setTokenExpiredHandler } from '../../../services/api';
 import { useAnalytics } from '../../analytics/hooks/useAnalytics';
 import type { User, AuthContextType } from '../../../models';
 
@@ -61,6 +61,57 @@ function decodeJwt(token: string): Record<string, any> {
 	}
 }
 
+/** AsyncStorage keys for persisted session data */
+const STORAGE_KEYS = {
+	accessToken: 'accessToken',
+	refreshToken: 'refreshToken',
+	tokenExpiresAt: 'tokenExpiresAt',
+	user: 'user',
+} as const;
+
+/** Number of milliseconds before expiry at which a proactive refresh is triggered */
+const REFRESH_BUFFER_MS = 60_000;
+
+/**
+ * Remove all persisted session data from AsyncStorage
+ */
+async function clearStoredSession(): Promise<void> {
+	await AsyncStorage.multiRemove(Object.values(STORAGE_KEYS));
+}
+
+/**
+ * Attempt to obtain a new access token using the stored refresh token.
+ * Updates AsyncStorage with the new credentials on success.
+ * @returns New access token, or null if refresh is not possible / fails
+ */
+async function tryRefreshToken(): Promise<string | null> {
+	try {
+		const refreshToken = await AsyncStorage.getItem(STORAGE_KEYS.refreshToken);
+		if (!refreshToken) {
+			console.log('[Auth] No refresh token stored, cannot refresh');
+			return null;
+		}
+
+		console.log('[Auth] Refreshing access token...');
+		const newCredentials = await auth0.auth.refreshToken({ refreshToken });
+
+		await AsyncStorage.setItem(STORAGE_KEYS.accessToken, newCredentials.accessToken);
+		const expiresAt = Date.now() + (newCredentials.expiresIn ?? 86400) * 1000;
+		await AsyncStorage.setItem(STORAGE_KEYS.tokenExpiresAt, String(expiresAt));
+
+		// Auth0 may rotate the refresh token — persist the new one if provided
+		if (newCredentials.refreshToken) {
+			await AsyncStorage.setItem(STORAGE_KEYS.refreshToken, newCredentials.refreshToken);
+		}
+
+		console.log('[Auth] Token refreshed successfully');
+		return newCredentials.accessToken;
+	} catch (error) {
+		console.error('[Auth] Token refresh failed:', error);
+		return null;
+	}
+}
+
 /**
  * Auth0 Provider Component for Native Platforms
  * Wraps the app to provide authentication context
@@ -82,18 +133,50 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 			setIsLoading(false);
 			return;
 		}
+
+		// Register a handler so that any mid-session 401 response silently signs the user out
+		setTokenExpiredHandler(() => {
+			console.log('[Auth] Received 401 from API, clearing expired session');
+			setAuthToken(null);
+			clearStoredSession();
+			setAccessToken(null);
+			setUser(null);
+			setIsAuthenticated(false);
+		});
+
 		checkAuth();
+
+		return () => setTokenExpiredHandler(null);
 	}, []);
 
 	/**
-	 * Restore authentication state from AsyncStorage and fetch updated profile
+	 * Restore authentication state from AsyncStorage and fetch updated profile.
+	 * If the stored token is expired (or expiring soon), attempts a silent refresh
+	 * using the stored refresh token. If the refresh fails, clears the session so
+	 * the user is prompted to log in again.
 	 */
 	const checkAuth = async () => {
 		try {
-			const token = await AsyncStorage.getItem('accessToken');
-			const userStr = await AsyncStorage.getItem('user');
-			
+			let token = await AsyncStorage.getItem(STORAGE_KEYS.accessToken);
+			const userStr = await AsyncStorage.getItem(STORAGE_KEYS.user);
+
 			if (token && userStr) {
+				// Check whether the token is expired or within the refresh buffer window
+				const expiresAtStr = await AsyncStorage.getItem(STORAGE_KEYS.tokenExpiresAt);
+				const expiresAt = expiresAtStr ? Number(expiresAtStr) : 0;
+				const isExpiredOrExpiring = !expiresAt || Date.now() >= expiresAt - REFRESH_BUFFER_MS;
+
+				if (isExpiredOrExpiring) {
+					console.log('[Auth] Stored token expired or expiring soon, attempting silent refresh...');
+					const refreshed = await tryRefreshToken();
+					if (!refreshed) {
+						console.log('[Auth] Silent refresh failed, clearing session');
+						await clearStoredSession();
+						return;
+					}
+					token = refreshed;
+				}
+
 				setAccessToken(token);
 				setAuthToken(token);
 				
@@ -114,8 +197,8 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 						isAdmin: profile.isAdmin,
 					};
 					setUser(updatedUser);
-					await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-					
+					await AsyncStorage.setItem(STORAGE_KEYS.user, JSON.stringify(updatedUser));
+
 					// Identify user in Clarity on app restart
 					identifyUser(updatedUser.sub, {
 						email: updatedUser.email,
@@ -153,8 +236,13 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 			const idTokenPayload = decodeJwt(credentials.idToken);
 			console.log('[Auth0] Decoded ID Token Payload:', idTokenPayload);
 
-			// Store access token and set for API calls
-			await AsyncStorage.setItem('accessToken', credentials.accessToken);
+			// Persist the access token, refresh token, and expiry time
+			await AsyncStorage.setItem(STORAGE_KEYS.accessToken, credentials.accessToken);
+			const expiresAt = Date.now() + (credentials.expiresIn ?? 86400) * 1000;
+			await AsyncStorage.setItem(STORAGE_KEYS.tokenExpiresAt, String(expiresAt));
+			if (credentials.refreshToken) {
+				await AsyncStorage.setItem(STORAGE_KEYS.refreshToken, credentials.refreshToken);
+			}
 			setAccessToken(credentials.accessToken);
 			setAuthToken(credentials.accessToken);
 			
@@ -179,7 +267,7 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 				};
 				console.log('[Auth0] User profile from API:', userInfo);
 				
-				await AsyncStorage.setItem('user', JSON.stringify(userInfo));
+				await AsyncStorage.setItem(STORAGE_KEYS.user, JSON.stringify(userInfo));
 				setUser(userInfo);
 				
 				// Identify user in Clarity after successful login
@@ -191,7 +279,7 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 			} catch (error) {
 				console.error('[Auth] Error fetching user profile from API:', error);
 				// Fallback to basic user info without backend profile
-				await AsyncStorage.setItem('user', JSON.stringify(basicUserInfo));
+				await AsyncStorage.setItem(STORAGE_KEYS.user, JSON.stringify(basicUserInfo));
 				setUser(basicUserInfo);
 				
 				// Identify user in Clarity even if backend profile fails
@@ -228,7 +316,7 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 				};
 			});
 			// Keep AsyncStorage in sync
-			const userStr = await AsyncStorage.getItem('user');
+			const userStr = await AsyncStorage.getItem(STORAGE_KEYS.user);
 			if (userStr) {
 				const storedUser = JSON.parse(userStr);
 				const updatedUser = {
@@ -237,7 +325,7 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 					email: profile.email,
 					isAdmin: profile.isAdmin,
 				};
-				await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+				await AsyncStorage.setItem(STORAGE_KEYS.user, JSON.stringify(updatedUser));
 			}
 		} catch (error) {
 			console.error('[Auth] Error refreshing user profile:', error);
@@ -252,11 +340,10 @@ export function Auth0ProviderNative({ children }: { children: ReactNode }) {
 		try {
 			// Clear API token
 			setAuthToken(null);
-			
+
 			await auth0.webAuth.clearSession();
-			await AsyncStorage.removeItem('accessToken');
-			await AsyncStorage.removeItem('user');
-			
+			await clearStoredSession();
+
 			setAccessToken(null);
 			setUser(null);
 			setIsAuthenticated(false);

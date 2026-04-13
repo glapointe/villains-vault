@@ -6,7 +6,7 @@
  */
 
 // Export client and auth helpers
-export { apiClient, setAuthToken } from './client';
+export { apiClient, setAuthToken, setTokenExpiredHandler } from './client';
 
 // Export all API modules
 export { usersApi } from './users.api';
