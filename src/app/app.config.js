@@ -60,18 +60,29 @@ const env = {
 console.log(`[app.config.js] Loading environment: .env.${envName}`);
 
 // Extract EXPO_PUBLIC_* variables
-// process.env takes priority (injected by EAS build profile env blocks),
-// then fall back to values loaded from .env files on disk.
-const expoProjectId = process.env.EXPO_PUBLIC_PROJECT_ID || env.EXPO_PUBLIC_PROJECT_ID;
-const auth0Domain = process.env.EXPO_PUBLIC_AUTH0_DOMAIN || env.EXPO_PUBLIC_AUTH0_DOMAIN || '';
-const auth0WebClientId = process.env.EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID || env.EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID || '';
-const auth0NativeClientId = process.env.EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID || env.EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID || '';
-const auth0Audience = process.env.EXPO_PUBLIC_AUTH0_AUDIENCE || env.EXPO_PUBLIC_AUTH0_AUDIENCE || '';
-const apiUrl = process.env.EXPO_PUBLIC_API_URL || env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
-const clarityWebProjectId = process.env.EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID || env.EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID || '';
-const clarityNativeProjectId = process.env.EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID || env.EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID || '';
-const disableDlsDeclarations = process.env.EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS || env.EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS || 'false';
-const disableCommunityEvents = process.env.EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS || env.EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS || 'false';
+// Priority depends on context:
+// - EAS cloud builds (EAS_BUILD=true): process.env wins (values injected by EAS profile env blocks)
+// - Local named-env builds (ENV_NAME=prod/staging): env file wins (Expo CLI auto-loads .env.local
+//   into process.env between invocations, which would otherwise override the named env file)
+// - Local default builds (ENV_NAME=local): process.env wins
+const isEasBuild = !!process.env.EAS_BUILD;
+const envFileFirst = !isEasBuild && envName !== 'local';
+
+const getVar = (key, fallback = '') =>
+	envFileFirst
+		? (env[key] || process.env[key] || fallback)
+		: (process.env[key] || env[key] || fallback);
+
+const expoProjectId = getVar('EXPO_PUBLIC_PROJECT_ID', undefined);
+const auth0Domain = getVar('EXPO_PUBLIC_AUTH0_DOMAIN');
+const auth0WebClientId = getVar('EXPO_PUBLIC_AUTH0_WEB_CLIENT_ID');
+const auth0NativeClientId = getVar('EXPO_PUBLIC_AUTH0_NATIVE_CLIENT_ID');
+const auth0Audience = getVar('EXPO_PUBLIC_AUTH0_AUDIENCE');
+const apiUrl = getVar('EXPO_PUBLIC_API_URL', 'http://localhost:5000');
+const clarityWebProjectId = getVar('EXPO_PUBLIC_CLARITY_WEB_PROJECT_ID');
+const clarityNativeProjectId = getVar('EXPO_PUBLIC_CLARITY_NATIVE_PROJECT_ID');
+const disableDlsDeclarations = getVar('EXPO_PUBLIC_DISABLE_DLS_DECLARATIONS', 'false');
+const disableCommunityEvents = getVar('EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS', 'false');
 
 // console.log('[app.config.js] Loaded environment variables:', {
 // 	expoProjectId: expoProjectId ? expoProjectId : '✗',
