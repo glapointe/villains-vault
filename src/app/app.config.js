@@ -100,7 +100,7 @@ module.exports = {
 	expo: {
 		name: 'Villains Vault',
 		slug: 'villains-vault',
-		version: '1.0.0',
+		version: '1.0.1',
 		orientation: 'default',
 		icon: './assets/villains-icon.png',
 		userInterfaceStyle: 'automatic',
@@ -113,7 +113,7 @@ module.exports = {
 		updates: {
 			url: `https://u.expo.dev/${expoProjectId}`,
 		},
-		runtimeVersion: '1.0.0',
+		runtimeVersion: '1.0.1',
 		splash: {
 			image: './assets/villains-splash-icon.png',
 			resizeMode: 'contain',
