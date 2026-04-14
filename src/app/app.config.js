@@ -96,11 +96,26 @@ const disableCommunityEvents = getVar('EXPO_PUBLIC_DISABLE_COMMUNITY_EVENTS', 'f
 // 	disableCommunityEvents: disableCommunityEvents === 'true' ? 'true' : 'false',
 // });
 
+
+// The user-facing app version shown in the Play Store / App Store.
+// Bump this for every release (semver: major.minor.patch).
+const version = '1.0.1';
+
+// Controls OTA update compatibility via Expo Updates.
+// Must match `version` whenever native code or plugins change (requires a new store build).
+// Can stay the same as the previous release for JS-only changes (enables silent OTA delivery).
+const runtimeVersion = '1.0.1';
+
+// Android-only integer build counter. Must ALWAYS increase with every build submitted to the
+// Play Store — never reset, even across major version bumps. EAS auto-increments this when
+// appVersionSource is "remote" (eas.json); update manually only when appVersionSource is "local".
+const versionCode = 9;
+
 module.exports = {
 	expo: {
 		name: 'Villains Vault',
 		slug: 'villains-vault',
-		version: '1.0.1',
+		version: version,
 		orientation: 'default',
 		icon: './assets/villains-icon.png',
 		userInterfaceStyle: 'automatic',
@@ -113,7 +128,7 @@ module.exports = {
 		updates: {
 			url: `https://u.expo.dev/${expoProjectId}`,
 		},
-		runtimeVersion: '1.0.1',
+		runtimeVersion: runtimeVersion,
 		splash: {
 			image: './assets/villains-splash-icon.png',
 			resizeMode: 'contain',
@@ -134,6 +149,7 @@ module.exports = {
 			edgeToEdgeEnabled: true,
 			predictiveBackGestureEnabled: true,
 			jsEngine: 'hermes',
+			versionCode: versionCode,
 			package: 'com.falchion.villains.vault',
 			permissions: ['android.permission.POST_NOTIFICATIONS'],
 			intentFilters: [
