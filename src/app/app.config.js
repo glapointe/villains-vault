@@ -106,10 +106,9 @@ const version = '1.0.1';
 // Can stay the same as the previous release for JS-only changes (enables silent OTA delivery).
 const runtimeVersion = '1.0.1';
 
-// Android-only integer build counter. Must ALWAYS increase with every build submitted to the
-// Play Store — never reset, even across major version bumps. EAS auto-increments this when
-// appVersionSource is "remote" (eas.json); update manually only when appVersionSource is "local".
-const versionCode = 9;
+// Android versionCode is managed automatically by EAS (appVersionSource: "remote" in eas.json).
+// Use `eas build:version:set --platform android` to manually sync if needed.
+// Run `npx expo prebuild --platform android --clean` after changing to regenerate with the new versionCode.
 
 module.exports = {
 	expo: {
@@ -149,7 +148,6 @@ module.exports = {
 			edgeToEdgeEnabled: true,
 			predictiveBackGestureEnabled: true,
 			jsEngine: 'hermes',
-			versionCode: versionCode,
 			package: 'com.falchion.villains.vault',
 			permissions: ['android.permission.POST_NOTIFICATIONS'],
 			intentFilters: [
