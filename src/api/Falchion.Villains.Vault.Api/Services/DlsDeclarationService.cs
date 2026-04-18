@@ -282,6 +282,11 @@ public class DlsDeclarationService
 						var user = await _userRepository.GetUserByDisplayNameAsync(import.Name?.Trim() ?? string.Empty);
 
 						var bibExists = await _repository.GetDeclarationByBibAndRaceAsync(dlsRaceId, import.BibNumber);
+						if (bibExists == null && user != null)
+						{
+							// See if we have a declaration for the user without the bib.
+							bibExists = await _repository.GetDeclarationByUserAndRaceAsync(dlsRaceId, user.Id);
+                        }
 
 						if (bibExists != null)
 						{
